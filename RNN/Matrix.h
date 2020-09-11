@@ -6,47 +6,53 @@
 #include <type_traits>
 #include <exception>
 #include <random>
-#include <typeinfo>
+#include <numeric>
 
 template<typename T>
 class Matrix
 {
 	static_assert(std::is_arithmetic_v<T>, "Unzulaessiger Typ fuer die Matrixinstanz\n");
 public:
-	//Konstruktoren
+//Konstruktoren
 	Matrix<T>(const std::vector<std::vector<T>>& matrix);
 	Matrix<T>(const size_t& row, const size_t& col);
 	Matrix<T>(const size_t& row, const size_t& col, const T& val);
-	//Funktionen auf Matrizen
+//Funktionen auf Matrizen
 	void print() const;
 	Matrix<T> transpose() const;
-	Matrix<T>& map(T function (T&));
-	Matrix<T>& randomize_int(int min, int max);
+	Matrix<T>& map(T function (const T&));
+	Matrix<T>& iota(const T &start);
+	Matrix<T>& randomize_int(const int min, const int max);
 	Matrix<T>& randomize_double(double min, double max);
-	//Getter
+//Getter
 	size_t get_rowdim() const;
 	size_t get_coldim() const;
 	T get_value(const size_t& row, const size_t& col) const;
-	//Setter
+//Setter
 	Matrix<T>& set_value(const size_t& row, const size_t& col, const T& val);
-	//Operatoren
-	bool operator==(const Matrix<T>& m2);
+//Operatoren
+	bool operator==(const Matrix<T>& m2) const;
 	Matrix<T>& operator=(const Matrix<T>& m2);
-	T operator()(const size_t& row, const size_t& col);
+
+	T operator()(const size_t& row, const size_t& col) const;
 	Matrix<T>& operator()(const size_t& row, const size_t& col, const T& val);
-	Matrix<T> operator+(const Matrix<T>& m2);
+
+	Matrix<T> operator+(const Matrix<T>& m2) const;
 	Matrix<T>& operator+=(const Matrix<T>& m2);
-	Matrix<T> operator+(const T& scalar);
+	Matrix<T> operator+(const T& scalar) const;
 	Matrix<T>& operator+=(const T& scalar);
-	Matrix<T> operator-(const Matrix<T>& m2);
+
+	Matrix<T> operator-(const Matrix<T>& m2) const;
 	Matrix<T>& operator-=(const Matrix<T>& m2);
-	Matrix<T> operator-(const T& scalar);
+	Matrix<T> operator-(const T& scalar) const;
 	Matrix<T>& operator-=(const T& scalar);
-	Matrix<T> operator*(const T& scalar);
+
+	Matrix<T> operator*(const T& scalar) const;
 	Matrix<T>& operator*=(const T& scalar);
-	Matrix<T> operator*(const Matrix<T>& m2);
+	Matrix<T> operator*(const Matrix<T>& m2) const;
 	Matrix<T>& operator*=(const Matrix<T>& m2);
-	Matrix<T> operator/(const T& scalar);
+
+	Matrix<T> operator/(const T& scalar) const;
 	Matrix<T>& operator/=(const T& scalar);
 
 private:
@@ -95,17 +101,17 @@ void Matrix<T>::print() const {
 } 
 template<typename T>
 Matrix<T> Matrix<T>::transpose() const {
-	Matrix<T> result(get_coldim(), get_rowdim(), 0);
-	for (int i = 0; i < get_rowdim(); i++) {
-		for (int j = 0; j < get_coldim(); j++) {
+	Matrix<T> result(coldim, rowdim, 0);
+	for (int i = 0; i < rowdim; i++) {
+		for (int j = 0; j < coldim; j++) {
 			result.set_value(j, i, matrix[i][j]);
 		}
 	}
 	return result;
 }
 template<typename T>
-Matrix<T>& Matrix<T>::map(T function (T&)) {  // :: a -> a
-	for (int i = 0; i < get_rowdim(); i++) {
+Matrix<T>& Matrix<T>::map(T function (const T&)) {  // :: a -> a // BROKEN
+	for (int i = 0; i < rowdim; i++) {
 		std::transform(
 			matrix[i].begin(),				//from
 			matrix[i].end(),				//to
@@ -114,7 +120,16 @@ Matrix<T>& Matrix<T>::map(T function (T&)) {  // :: a -> a
 	}
 	return *this;
 }
-Matrix<int>& Matrix<int>::randomize_int(int min, int max) {
+template<typename T>
+Matrix<T>& Matrix<T>::iota(const T& start) {
+	for (int i = 0; i < rowdim; i++) {
+		for (int j = 0; j < coldim; j++) {
+			matrix[i][j] = i * rowdim + j + start;
+		}
+	}
+	return *this;
+}
+Matrix<int>& Matrix<int>::randomize_int(const int min, const int max) {
 	std::random_device rd;
 	std::mt19937 seed(rd());
 	std::uniform_int_distribution<int> dist(min, max);
@@ -180,17 +195,17 @@ T Matrix<T>::get_value(const size_t& row, const size_t& col) const {
 // TODO: PROBLEM BEHEBEN BEI R_VALUE-EXCEPTION
 template<typename T>
 Matrix<T>& Matrix<T>::operator=(const Matrix<T>& m2) {
-	this->rowdim = m2.get_rowdim();
-	this->coldim = m2.get_coldim();
+	this->rowdim = m2.rowdim;
+	this->coldim = m2.coldim;
 	this->matrix = m2.matrix;
 	return *this;
 }
 template<typename T>
-bool Matrix<T>::operator==(const Matrix<T>& m2) {
+bool Matrix<T>::operator==(const Matrix<T>& m2) const  {
 	return matrix == m2.matrix;
 }
 template<typename T>
-T Matrix<T>::operator()(const size_t& row, const size_t& col) {
+T Matrix<T>::operator()(const size_t& row, const size_t& col) const {
 	try {
 		return matrix.at(row).at(col);
 	}
@@ -211,11 +226,11 @@ Matrix<T>& Matrix<T>::operator()(const size_t& row, const size_t& col, const T& 
 	}
 }
 template<typename T>
-Matrix<T> Matrix<T>::operator+(const Matrix<T>& m2) {
+Matrix<T> Matrix<T>::operator+(const Matrix<T>& m2) const {
 	try {
 		if (rowdim != m2.rowdim || coldim != m2.coldim) throw std::invalid_argument("Matrixdimensionen muessen uebereinstimmen\n");
-		Matrix<T> result(get_rowdim(), get_coldim());
-		for (int i = 0; i < get_rowdim(); i++) {
+		Matrix<T> result(rowdim, coldim);
+		for (int i = 0; i < rowdim; i++) {
 			std::transform(
 				matrix[i].begin(),				//from
 				matrix[i].end(),				//to
@@ -241,9 +256,9 @@ Matrix<T>& Matrix<T>::operator+=(const Matrix<T>& m2) {
 	}
 }
 template<typename T>
-Matrix<T> Matrix<T>::operator+(const T& scalar) {
-	Matrix<T> result(get_rowdim(), get_coldim());
-	for (int i = 0; i < get_rowdim(); i++) {
+Matrix<T> Matrix<T>::operator+(const T& scalar) const {
+	Matrix<T> result(rowdim, coldim);
+	for (int i = 0; i < rowdim; i++) {
 		std::transform(
 			matrix[i].begin(),								//from
 			matrix[i].end(),								//to
@@ -258,11 +273,11 @@ Matrix<T>& Matrix<T>::operator+=(const T& scalar) {
 	return *this;
 }
 template<typename T>
-Matrix<T> Matrix<T>::operator-(const Matrix<T>& m2) {
+Matrix<T> Matrix<T>::operator-(const Matrix<T>& m2) const {
 	try {
 		if (rowdim != m2.rowdim || coldim != m2.coldim) throw std::invalid_argument("Matrixdimensionen muessen uebereinstimmen\n");
-		Matrix<T> result(get_rowdim(), get_coldim());
-		for (int i = 0; i < get_rowdim(); i++) {
+		Matrix<T> result(rowdim, coldim);
+		for (int i = 0; i < rowdim; i++) {
 			std::transform(
 				matrix[i].begin(),			//from
 				matrix[i].end(),			//to
@@ -287,9 +302,9 @@ Matrix<T>& Matrix<T>::operator-=(const Matrix<T>& m2) {
 	}
 }
 template<typename T>
-Matrix<T> Matrix<T>::operator-(const T& scalar) {
-	Matrix<T> result(get_rowdim(), get_coldim());
-	for (int i = 0; i < get_rowdim(); i++) {
+Matrix<T> Matrix<T>::operator-(const T& scalar) const {
+	Matrix<T> result(rowdim, coldim);
+	for (int i = 0; i < rowdim; i++) {
 		std::transform(
 			matrix[i].begin(),								//from
 			matrix[i].end(),								//to
@@ -304,9 +319,9 @@ Matrix<T>& Matrix<T>::operator-=(const T& scalar) {
 	return *this;
 }
 template<typename T>
-Matrix<T> Matrix<T>::operator*(const T& scalar) {
-	Matrix<T> result(get_rowdim(), get_coldim());
-	for (int i = 0; i < get_rowdim(); i++) {
+Matrix<T> Matrix<T>::operator*(const T& scalar) const {
+	Matrix<T> result(rowdim, coldim);
+	for (int i = 0; i < rowdim; i++) {
 		std::transform(
 			matrix[i].begin(),								//from
 			matrix[i].end(),								//to
@@ -321,13 +336,13 @@ Matrix<T>& Matrix<T>::operator*=(const T& scalar) {
 	return *this;
 }
 template<typename T>
-Matrix<T> Matrix<T>::operator*(const Matrix<T>& m2) {
+Matrix<T> Matrix<T>::operator*(const Matrix<T>& m2) const {
 	try {
 		if (coldim != m2.rowdim) throw std::invalid_argument("Spaltendimension der ersten Matrix stimmt nicht mit der Zeilendimension der zweiten Matrix überein.\n");
-		Matrix<T> result(get_rowdim(), m2.get_coldim());
-		for (int i = 0; i < get_rowdim(); i++) {
-			for (int j = 0; j < m2.get_coldim(); j++) {
-				for (int k = 0; k < get_coldim(); k++) {
+		Matrix<T> result(rowdim, m2.coldim);
+		for (int i = 0; i < rowdim; i++) {
+			for (int j = 0; j < m2.coldim; j++) {
+				for (int k = 0; k < coldim; k++) {
 					result.matrix[i][j] += this->matrix[i][k] * m2.matrix[k][j];
 				}
 			}
@@ -350,11 +365,11 @@ Matrix<T>& Matrix<T>::operator*=(const Matrix<T>& m2) {
 	}
 }
 template<typename T>
-Matrix<T> Matrix<T>::operator/(const T& scalar) {
+Matrix<T> Matrix<T>::operator/(const T& scalar) const {
 	try {
 		if (scalar == 0) throw std::invalid_argument("Division durch 0\n");
-		Matrix<T> result(get_rowdim(), get_coldim());
-		for (int i = 0; i < get_rowdim(); i++) {
+		Matrix<T> result(rowdim, coldim);
+		for (int i = 0; i < rowdim; i++) {
 			std::transform(
 				matrix[i].begin(),								//from
 				matrix[i].end(),								//to
