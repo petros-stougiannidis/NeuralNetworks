@@ -9,12 +9,11 @@ int f(const int& val) {
 }
 
 int main(int argc, char** argv) {
-	Matrix<int> m1(3, 3);
-	m1.iota(10);
-	Matrix<int> m2(3, 3, 2);
-
-	Matrix<int> m3 = m1 / 2;
-	m3 /= 100;
+	Matrix<int> m1(1, 5, 10);
+	Matrix<int> m2(5, 4, 2);
+	Matrix<int> m3(std::vector<std::vector<int>>(0, std::vector<int>(2, 1)));
+	
+	m1 *= m2;
 
 
 	

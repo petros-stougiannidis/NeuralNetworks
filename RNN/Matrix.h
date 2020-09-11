@@ -14,6 +14,7 @@ class Matrix
 	static_assert(std::is_arithmetic_v<T>, "Unzulaessiger Typ fuer die Matrixinstanz\n");
 public:
 //Konstruktoren
+	Matrix<T>();
 	Matrix<T>(const std::vector<std::vector<T>>& matrix);
 	Matrix<T>(const size_t& row, const size_t& col);
 	Matrix<T>(const size_t& row, const size_t& col, const T& val);
@@ -66,17 +67,40 @@ private:
 /********************************************************************************************/
 
 template<typename T>
+Matrix<T>::Matrix() : rowdim(0), coldim(0), matrix(std::vector<std::vector<T>>(0, std::vector<T>(0, 0))) {}
+template<typename T>
 Matrix<T>::Matrix(const std::vector<std::vector<T>>& vec) : rowdim(vec.size()), coldim(rowdim > 0 ? vec[0].size() : 0), matrix(vec) {
-	for (int i = 0; i < rowdim; i++) {
-		for (int j = 0; j < coldim; j++) {
-			matrix[i][j] = vec[i][j];
+	try {
+		if (rowdim < 1 || coldim < 1) throw std::invalid_argument("Matrix muss mindestes die Dimension 1x1 haben");
+		for (int i = 0; i < rowdim; i++) {
+			for (int j = 0; j < coldim; j++) {
+				matrix[i][j] = vec[i][j];
+			}
 		}
+	}
+	catch (std::invalid_argument& error) {
+		std::cerr << error.what() << std::endl;
+	}
+	
+}
+template<typename T>
+Matrix<T>::Matrix(const size_t& row, const size_t& col) : rowdim(row), coldim(col), matrix(std::vector<std::vector<T>>(row, std::vector<T>(col))) {
+	try {
+		if (row < 1 || col < 1) throw std::invalid_argument("Matrix muss mindestes die Dimension 1x1 haben");
+	}
+	catch (std::invalid_argument& error) {
+		std::cerr << error.what() << std::endl;
 	}
 }
 template<typename T>
-Matrix<T>::Matrix(const size_t& row, const size_t& col) : rowdim(row), coldim(col), matrix(std::vector<std::vector<T>>(row, std::vector<T>(col))) {}
-template<typename T>
-Matrix<T>::Matrix(const size_t& row, const size_t& col, const T& val) : rowdim(row), coldim(col), matrix(std::vector<std::vector<T>>(row, std::vector<T>(col, val))) {}
+Matrix<T>::Matrix(const size_t& row, const size_t& col, const T& val) : rowdim(row), coldim(col), matrix(std::vector<std::vector<T>>(row, std::vector<T>(col, val))) {
+	try {
+		if (row < 1 || col < 1) throw std::invalid_argument("Matrix muss mindestes die Dimension 1x1 haben");
+	}
+	catch (std::invalid_argument& error) {
+		std::cerr << error.what() << std::endl;
+	}
+}
 
 /********************************************************************************************/
 /*                                       FUNKTIONEN                                         */
