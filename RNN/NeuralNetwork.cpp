@@ -10,7 +10,8 @@ using WeightMatrices = std::vector<Matrix<double>>;
 // ein Netz mit 10 Inputneuronen, zwei Hidden Layer mit jeweils 20 und 30 Neuronen und 15   //
 // Outputneuronen.                                                                          //
 //////////////////////////////////////////////////////////////////////////////////////////////
-NeuralNetwork::NeuralNetwork(const double& learningrate, const std::vector<size_t>& dimensions) : learningrate(learningrate), dimensions(dimensions), weights(WeightMatrices(dimensions.size() - 1)) {
+NeuralNetwork::NeuralNetwork(const double& learningrate, const std::vector<size_t>& dimensions)
+    : learningrate(learningrate), dimensions(dimensions), weights(WeightMatrices(dimensions.size() - 1)) {
     try {
         if (dimensions.size() < 1) throw std::invalid_argument("Es werden mindestens ein Eingangs- und eine Ausgangsschicht benoetigt");
 
@@ -20,14 +21,19 @@ NeuralNetwork::NeuralNetwork(const double& learningrate, const std::vector<size_
             weights[i] = Matrix<double>(dimensions[i + 1], dimensions[i], 0);
             weights[i].randomize_double(0.33, 0.66); //TODO: Spezielle Randomizefunktion unter Normalverteilung
         }
-        // Da eine Gewichtsmatrix die Gewichtungen zwischen zwei Neuronenschichten darstellt, gibt es bei n Neuronenschichten immer n-1 Gewichtungsmatrizen.
-        // Deshalb wurde weights mit der Länge dimensions.size() - 1 initialisiert. Die Zeilenanzahl einer Gewichtungsmatrix entspricht der Neuronenanzahl 
-        // der Schicht in die sie führt und die Spaltenanzahl entspricht der Neuronenanzahl der Schicht aus der sie stammt, daher wird die Matrix an der Stelle
-        // i, also weights[i],  mit einer Matrix mit Zeilenanzahl dimensions[i + 1] und Spaltenanzahl dimensions[i] initialisiert. Die Matrizen werden dann mit zu-
-        // fälligen double-Werten besetzt.
     }
     catch (std::invalid_argument& error) {std::cerr << error.what() << std::endl;}
 }
+//////////////////////////////////////////////////////////////////////////////////////////////
+// Da eine Gewichtsmatrix die Gewichtungen zwischen zwei Neuronenschichten darstellt, gibt  //
+// es bei n Neuronenschichten immer n-1 Gewichtungsmatrizen. Deshalb wurde weights mit der  //
+// Länge dimensions.size() - 1 initialisiert. Die Zeilenanzahl einer Gewichtungsmatrix ent- //
+// spricht der Neuronenanzahl der Schicht in die sie führt und die Spaltenanzahl entspricht //
+// der Neuronenanzahl der Schicht aus der sie stammt, daher wird die Matrix an der Stelle   //
+// i, also weights[i],  mit einer Matrix mit Zeilenanzahl dimensions[i + 1] und Spaltenan-  //
+// zahl dimensions[i] initialisiert. Die Matrizen werden dann mit zufälligen double-Werten  //
+// besetzt.                                                                                 //
+//////////////////////////////////////////////////////////////////////////////////////////////
 /********************************************************************************************/
 /*                                       FUNKTIONEN                                         */
 /********************************************************************************************/
@@ -37,7 +43,7 @@ NeuralNetwork::NeuralNetwork(const double& learningrate, const std::vector<size_
 // stand des Netzes erhält man mit dieser Funktion eine Lösung für eine Regressions- oder   //
 // Klassifikationsaufgabe.                                                                  //
 //////////////////////////////////////////////////////////////////////////////////////////////
-// MATH //////////////////////////////////////////////////////////////////////////////////////
+// mathematisch //////////////////////////////////////////////////////////////////////////////
 double id(const double& x) {
     return x;
 }
@@ -45,7 +51,7 @@ double sigmoid(const double& x) {
     return 1 / (1 + exp(-x));
 }
 //////////////////////////////////////////////////////////////////////////////////////////////
-//Netzfunktionen//////////////////////////////////////////////////////////////////////////////
+// Netzfunktionen ////////////////////////////////////////////////////////////////////////////
 Matrix<double> NeuralNetwork::query(const Matrix<double>& input) const {
     Matrix<double> output = input;
     for (int i = 0; i < weights.size(); i++) {
