@@ -22,7 +22,14 @@ NeuralNetwork::NeuralNetwork(const double& learningrate, const Dimensions& dimen
 
         for (int i = 0; i < weights.size(); i++) {
             weights[i] = Matrix<double>(dimensions[i + 1], dimensions[i], 0);
-            weights[i].randomize_double(0.33, 0.66); //TODO: Spezielle Randomizefunktion unter Normalverteilung
+            weights[i].randomize_double(-1/sqrt(dimensions[i]), 1 / sqrt(dimensions[i])); 
+//////////////////////////////////////////////////////////////////////////////////////////////
+// Die Funktion randomize_double(double a, double b) besetzt eine Matrix mit zufälligen     //
+// double-Werten innerhalb des Intervalls [a,b)/{0}. Die hier gewählten Grenzen             //
+// -1/sqrt(dimensions[i]) und 1 / sqrt(dimensions[i]) entsprechen der                       //
+// "Xavier-Initialisierung" und sind abhängig von der Spaltenanzahl der Gewichtungsmatrix.  //
+// Diese Technik führt zu einem effizienteren Lernen.                                       //
+//////////////////////////////////////////////////////////////////////////////////////////////
         }
     }
     catch (std::invalid_argument& error) {std::cerr << error.what() << std::endl;}

@@ -176,6 +176,10 @@ Matrix<T>& Matrix<T>::randomize_double(double min, double max) {
 	for (int i = 0; i < rowdim; i++) {
 		for (int j = 0; j < coldim; j++) {
 			matrix[i][j] = dist(seed);
+			while (matrix[i][j] == 0) {
+				matrix[i][j] = dist(seed);
+				std::cout << "Matrix Element wurde zufällig auf 0 gesetzt!" << std::endl; // TODO: Prüfen
+			}
 		}
 
 	}
