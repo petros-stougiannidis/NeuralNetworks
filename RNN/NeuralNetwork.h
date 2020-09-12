@@ -4,18 +4,16 @@
 class NeuralNetwork {
 public:
 //Konstruktoren
-    NeuralNetwork(double learningrate, std::vector<int> dimensions);
+    NeuralNetwork(const double& learningrate, const std::vector<size_t>& dimensions);
 //Funktionen
-    void query() const;
+    Matrix<double> query(const Matrix<double>& input) const;
     void train();
-   
 //Getter & Setter
     std::vector<Matrix<double>> get_weights() const;
-    std::vector<int> get_dimensions() const;
+    std::vector<size_t> get_dimensions() const;
 private:
-
     double learningrate;
-    std::vector<int> dimensions;
+    std::vector<size_t> dimensions;
     std::vector<Matrix<double>> weights;
 };
 
