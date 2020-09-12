@@ -139,10 +139,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DataConverter.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="NeuralNetwork.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DataConverter.h" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="NeuralNetwork.h" />
   </ItemGroup>

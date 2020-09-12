@@ -21,12 +21,18 @@
     <ClCompile Include="NeuralNetwork.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="DataConverter.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Matrix.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="NeuralNetwork.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="DataConverter.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

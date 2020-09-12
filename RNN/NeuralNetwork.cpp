@@ -39,7 +39,7 @@ void NeuralNetwork::query() const {
 //////////////////////////////////////////////////////////////////////////////////////////////
 // Die Funktion train() führt einmal die Funktion query() aus, vergleicht den Outputvektor  //
 // mit den Label des Datensatzes, berechnet daraus den Fehler E und passt dann mit Back-    //
-// propagation die Gewichtungen an.                                                          //
+// propagation die Gewichtungen an.                                                         //
 //////////////////////////////////////////////////////////////////////////////////////////////
 void NeuralNetwork::train() {
 
