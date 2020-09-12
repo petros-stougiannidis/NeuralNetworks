@@ -1,5 +1,5 @@
 #include "NeuralNetwork.h"
-#include <iostream>
+
 
 using vec = std::vector<Matrix<double>>;
 int main(int argc, char** argv) {

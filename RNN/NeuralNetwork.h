@@ -14,6 +14,7 @@ public:
     std::vector<int> get_dimensions() const;
 private:
 
+    double learningrate;
     std::vector<int> dimensions;
     std::vector<Matrix<double>> weights;
 };
