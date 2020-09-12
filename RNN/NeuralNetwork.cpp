@@ -1,3 +1,4 @@
+// Test Git_Username
 #include "NeuralNetwork.h"
 #include <algorithm>
 #define ACTIVATION sigmoid // Zur Verfügung stehen bisher "id", "sigmoid", "ReLU", "tanh" und "softsign".
