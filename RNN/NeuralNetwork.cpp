@@ -1,5 +1,7 @@
 #include "NeuralNetwork.h"
-#define ACTIVATION sigmoid // Zur Verfügung stehen bisher "id" und "sigmoid"
+#include <algorithm>
+#define ACTIVATION sigmoid // Zur Verfügung stehen bisher "id", "sigmoid", "ReLU", "tanh" und "softsign".
+//TODO: simoid-He-Initialisation; tanh-Xavier-Initialisation
 using WeightMatrices = std::vector<Matrix<double>>;
 using Dimensions = std::vector<size_t>;
 /********************************************************************************************/
@@ -48,8 +50,30 @@ NeuralNetwork::NeuralNetwork(const double& learningrate, const Dimensions& dimen
 double id(const double& x) {
     return x;
 }
+double id_derivate(const double& x) {
+    return 1;
+}
 double sigmoid(const double& x) {
     return 1 / (1 + exp(-x));
+}
+double sigmoid_derivate(const double& x) {
+    return sigmoid(1 - sigmoid(x));
+}
+double ReLU(const double& x) {
+    return (0 <= x) ? x : 0;
+}
+double ReLU_derivate(const double& x) {
+    return (0 <= x) ? 1 : 0;
+}
+//double tanh(const double& x) In cmath definiert
+double tanh_derivate(const double& x) {
+    return 1 - pow(tanh(x), 2);
+}
+double softsign(const double& x) {
+    return x / (1 + abs(x));
+}
+double softsign_derivate(const double& x) {
+    return 1 / pow((1 + abs(x)), 2);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////
 // Netzfunktionen ////////////////////////////////////////////////////////////////////////////
