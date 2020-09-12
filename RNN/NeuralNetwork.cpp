@@ -1,6 +1,7 @@
 #include "NeuralNetwork.h"
 #define ACTIVATION sigmoid // Zur Verfügung stehen bisher "id" und "sigmoid"
 using WeightMatrices = std::vector<Matrix<double>>;
+using Dimensions = std::vector<size_t>;
 /********************************************************************************************/
 /*                               KONSTRUKTOR/DESTRUKTOR                                     */
 /********************************************************************************************/
@@ -10,7 +11,7 @@ using WeightMatrices = std::vector<Matrix<double>>;
 // ein Netz mit 10 Inputneuronen, zwei Hidden Layer mit jeweils 20 und 30 Neuronen und 15   //
 // Outputneuronen.                                                                          //
 //////////////////////////////////////////////////////////////////////////////////////////////
-NeuralNetwork::NeuralNetwork(const double& learningrate, const std::vector<size_t>& dimensions)
+NeuralNetwork::NeuralNetwork(const double& learningrate, const Dimensions& dimensions)
     : learningrate(learningrate), dimensions(dimensions), weights(WeightMatrices(dimensions.size() - 1)) {
     try {
         if (dimensions.size() < 1) throw std::invalid_argument("Es werden mindestens ein Eingangs- und eine Ausgangsschicht benoetigt");
@@ -72,10 +73,10 @@ void NeuralNetwork::train() {
 /********************************************************************************************/
 //////////////////////////////////////////////////////////////////////////////////////////////
 // Getter ////////////////////////////////////////////////////////////////////////////////////
-std::vector<Matrix<double>> NeuralNetwork::get_weights() const {
+WeightMatrices NeuralNetwork::get_weights() const {
     return weights;
 }
-std::vector<size_t> NeuralNetwork::get_dimensions() const {
+Dimensions NeuralNetwork::get_dimensions() const {
     return dimensions;
 }
 

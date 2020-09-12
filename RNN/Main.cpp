@@ -4,6 +4,8 @@
 using WeightMatrices = std::vector<Matrix<double>>;
 int main(int argc, char** argv) {
 
+
+
 	NeuralNetwork n1(0.5, { 8,2,2,3,4,5,6,7,8 });
 	WeightMatrices ws = n1.get_weights();
 	for (auto& matrix : ws) {
