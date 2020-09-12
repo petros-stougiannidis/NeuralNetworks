@@ -153,7 +153,10 @@ Matrix<T>& Matrix<T>::iota(const T& start) {
 	}
 	return *this;
 }
-Matrix<int>& Matrix<int>::randomize_int(const int min, const int max) {
+
+//static_assert(std::is_integral_v<int>, "Unzulaessiger Typ fuer die Matrixinstanz\n"); // TODO::TYP EINSCHRÄNKEN
+template<typename T>
+Matrix<T>& Matrix<T>::randomize_int(const int min, const int max) {
 	std::random_device rd;
 	std::mt19937 seed(rd());
 	std::uniform_int_distribution<int> dist(min, max);
@@ -164,9 +167,9 @@ Matrix<int>& Matrix<int>::randomize_int(const int min, const int max) {
 		
 	}
 	return *this;
-}
-
-Matrix<double>& Matrix<double>::randomize_double(double min, double max) {
+} 
+template<typename T>
+Matrix<T>& Matrix<T>::randomize_double(double min, double max) {
 	std::random_device rd;
 	std::mt19937 seed(rd());
 	std::uniform_real_distribution<double> dist(min, max);
