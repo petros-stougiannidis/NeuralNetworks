@@ -2,9 +2,11 @@
 #include "NeuralNetwork.h"
 #include <algorithm>
 #define ACTIVATION sigmoid // Zur Verfügung stehen bisher "id", "sigmoid", "ReLU", "tanh" und "softsign".
+#define ACTIVATION_DERIVATIVE sigmoid_derivative
 //TODO: simoid-He-Initialisation; tanh-Xavier-Initialisation
-using WeightMatrices = std::vector<Matrix<double>>;
 using Dimensions = std::vector<size_t>;
+using WeightMatrices = std::vector<Matrix<double>>;
+using Biases = std::vector < Matrix<double>>;
 /********************************************************************************************/
 /*                               KONSTRUKTOR/DESTRUKTOR                                     */
 /********************************************************************************************/
@@ -15,7 +17,7 @@ using Dimensions = std::vector<size_t>;
 // Outputneuronen.                                                                          //
 //////////////////////////////////////////////////////////////////////////////////////////////
 NeuralNetwork::NeuralNetwork(const double& learningrate, const Dimensions& dimensions)
-    : learningrate(learningrate), dimensions(dimensions), weights(WeightMatrices(dimensions.size() - 1)) {
+    : learningrate(learningrate), dimensions(dimensions), weights(WeightMatrices(dimensions.size() - 1)), biases(Biases(weights.size())) {
     try {
         if (dimensions.size() < 1) throw std::invalid_argument("Es werden mindestens ein Eingangs- und eine Ausgangsschicht benoetigt");
 
@@ -23,14 +25,11 @@ NeuralNetwork::NeuralNetwork(const double& learningrate, const Dimensions& dimen
 
         for (int i = 0; i < weights.size(); i++) {
             weights[i] = Matrix<double>(dimensions[i + 1], dimensions[i], 0);
-            weights[i].randomize_double(-1/sqrt(dimensions[i]), 1 / sqrt(dimensions[i])); 
-//////////////////////////////////////////////////////////////////////////////////////////////
-// Die Funktion randomize_double(double a, double b) besetzt eine Matrix mit zufälligen     //
-// double-Werten innerhalb des Intervalls [a,b)/{0}. Die hier gewählten Grenzen             //
-// -1/sqrt(dimensions[i]) und 1 / sqrt(dimensions[i]) entsprechen der                       //
-// "Xavier-Initialisierung" und sind abhängig von der Spaltenanzahl der Gewichtungsmatrix.  //
-// Diese Technik führt zu einem effizienteren Lernen.                                       //
-//////////////////////////////////////////////////////////////////////////////////////////////
+            weights[i].randomize_double(-1 / sqrt(dimensions[i]), 1 / sqrt(dimensions[i]));
+        }
+
+        for (int i = 0; i < weights.size(); i++) {
+            biases[i] = Matrix<double>(dimensions[i + 1], 1);
         }
     }
     catch (std::invalid_argument& error) {std::cerr << error.what() << std::endl;}
@@ -45,60 +44,69 @@ NeuralNetwork::NeuralNetwork(const double& learningrate, const Dimensions& dimen
 // zahl dimensions[i] initialisiert. Die Matrizen werden dann mit zufälligen double-Werten  //
 // besetzt.                                                                                 //
 //////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////
+// Die Funktion randomize_double(double a, double b) besetzt eine Matrix mit zufälligen     //
+// double-Werten innerhalb des Intervalls [a,b)/{0}. Die hier gewählten Grenzen             //
+// -1/sqrt(dimensions[i]) und 1 / sqrt(dimensions[i]) entsprechen der                       //
+// "Xavier-Initialisierung" und sind abhängig von der Spaltenanzahl der Gewichtungsmatrix.  //
+// Diese Technik führt zu einem effizienteren Lernen.                                       //
+//////////////////////////////////////////////////////////////////////////////////////////////
 /********************************************************************************************/
 /*                                       FUNKTIONEN                                         */
 /********************************************************************************************/
 //////////////////////////////////////////////////////////////////////////////////////////////
-// Die Funktion query() bekommt einen Inputvektor als Argument, lässt diesen einmal durch   //
-// das neuronale Netz laufen und gibt dann einen Outputvektor zurück. Im trainierten Zu-    //
-// stand des Netzes erhält man mit dieser Funktion eine Lösung für eine Regressions- oder   //
+// Die Funktion feed_forward() bekommt einen Inputvektor als Argument, lässt diesen einmal   //
+// durch das neuronale Netz laufen und gibt dann einen Outputvektor zurück. Im trainierten  //
+// Zustand des Netzes erhält man mit dieser Funktion eine Lösung für eine Regressions- oder //
 // Klassifikationsaufgabe.                                                                  //
 //////////////////////////////////////////////////////////////////////////////////////////////
 // mathematisch //////////////////////////////////////////////////////////////////////////////
 double id(const double& x) {
     return x;
 }
-double id_derivate(const double& x) {
+double id_derivative(const double& x) {
     return 1;
 }
 double sigmoid(const double& x) {
     return 1 / (1 + exp(-x));
 }
-double sigmoid_derivate(const double& x) {
+double sigmoid_derivative(const double& x) {
     return sigmoid(1 - sigmoid(x));
 }
 double ReLU(const double& x) {
     return (0 <= x) ? x : 0;
 }
-double ReLU_derivate(const double& x) {
+double ReLU_derivative(const double& x) {
     return (0 <= x) ? 1 : 0;
 }
 //double tanh(const double& x) In cmath definiert
-double tanh_derivate(const double& x) {
+double tanh_derivative(const double& x) {
     return 1 - pow(tanh(x), 2);
 }
 double softsign(const double& x) {
     return x / (1 + abs(x));
 }
-double softsign_derivate(const double& x) {
+double softsign_derivative(const double& x) {
     return 1 / pow((1 + abs(x)), 2);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////
 // Netzfunktionen ////////////////////////////////////////////////////////////////////////////
-Matrix<double> NeuralNetwork::query(const Matrix<double>& input) const {
+Matrix<double> NeuralNetwork::feed_forward(const Matrix<double>& input) const {
     Matrix<double> output = input;
     for (int i = 0; i < weights.size(); i++) {
-        output = (weights[i] * output).map(ACTIVATION);
+        output = (weights[i] * output) + biases[i];
+        output.map(ACTIVATION);
     }
     return  output;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////
-// Die Funktion train() führt einmal die Funktion query() aus, vergleicht den Outputvektor  //
-// mit den Label des Datensatzes, berechnet daraus den Fehler E und passt dann mit Back-    //
-// propagation die Gewichtungen an.                                                         //
+// Die Funktion train() führt einmal die Funktion feed_forward() aus, vergleicht den        //
+// Outputvektor mit den Label des Datensatzes, berechnet daraus den Fehler E und passt dann //
+// mit Backpropagation die Gewichtungen und den Bias an.                                    //
 //////////////////////////////////////////////////////////////////////////////////////////////
-void NeuralNetwork::train() {
-
+void NeuralNetwork::train(const Matrix<double>& input, const Matrix<double>& training_data) {
+    Matrix<double> E_0 = (feed_forward(input) - training_data);
+    E_0.map(ACTIVATION_DERIVATIVE);
 }
 /********************************************************************************************/
 /*                                     GETTER & SETTER                                      */

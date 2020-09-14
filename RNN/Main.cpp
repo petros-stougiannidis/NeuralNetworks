@@ -14,6 +14,9 @@ int main(int argc, char** argv) {
 	}
 	Matrix<double> matrix(8, 1, 0);
 	matrix.randomize_double(0,1);
-	Matrix<double> m1 = n1.query(matrix);
+	Matrix<double> m1 = n1.feed_forward(matrix);
 	m1.print();
+
+
+	//std::vector<NeuralNetwork>(10, NeuralNetwork(0.5, { 8,2,2,3,4,5,6,7,8 }));
 }
