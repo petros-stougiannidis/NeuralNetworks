@@ -17,11 +17,18 @@ using Biases = std::vector < Matrix<double>>;
 // Outputneuronen.                                                                          //
 //////////////////////////////////////////////////////////////////////////////////////////////
 NeuralNetwork::NeuralNetwork(const double& learningrate, const Dimensions& dimensions)
-    : learningrate(learningrate), dimensions(dimensions), weights(WeightMatrices(dimensions.size() - 1)), biases(Biases(weights.size())) {
-    try {
-        if (dimensions.size() < 1) throw std::invalid_argument("Es werden mindestens ein Eingangs- und eine Ausgangsschicht benoetigt");
+    try :   learningrate(learningrate),
+            dimensions(dimensions),
+            weights(WeightMatrices(dimensions.size() - 1)),
+            biases(Biases(weights.size())) {
 
-        for (const size_t& val : dimensions) if (val <= 0) throw std::invalid_argument("Es wird mindestens ein Knoten pro Schicht benoetigt");
+        if (dimensions.size() < 2) 
+            throw std::invalid_argument
+            ("Es werden mindestens ein Eingangs- und eine Ausgangsschicht benoetigt");
+
+        for (const size_t& val : dimensions) if (val <= 0) 
+            throw std::invalid_argument
+            ("Es wird mindestens ein Knoten pro Schicht benoetigt");
 
         for (int i = 0; i < weights.size(); i++) {
             weights[i] = Matrix<double>(dimensions[i + 1], dimensions[i], 0);
@@ -31,9 +38,9 @@ NeuralNetwork::NeuralNetwork(const double& learningrate, const Dimensions& dimen
         for (int i = 0; i < weights.size(); i++) {
             biases[i] = Matrix<double>(dimensions[i + 1], 1);
         }
-    }
-    catch (std::invalid_argument& error) {std::cerr << error.what() << std::endl;}
-}
+
+    } catch (std::invalid_argument& error) { std::cerr << error.what() << std::endl; }
+
 //////////////////////////////////////////////////////////////////////////////////////////////
 // Da eine Gewichtsmatrix die Gewichtungen zwischen zwei Neuronenschichten darstellt, gibt  //
 // es bei n Neuronenschichten immer n-1 Gewichtungsmatrizen. Deshalb wurde weights mit der  //
@@ -51,15 +58,10 @@ NeuralNetwork::NeuralNetwork(const double& learningrate, const Dimensions& dimen
 // "Xavier-Initialisierung" und sind abhängig von der Spaltenanzahl der Gewichtungsmatrix.  //
 // Diese Technik führt zu einem effizienteren Lernen.                                       //
 //////////////////////////////////////////////////////////////////////////////////////////////
+
 /********************************************************************************************/
 /*                                       FUNKTIONEN                                         */
 /********************************************************************************************/
-//////////////////////////////////////////////////////////////////////////////////////////////
-// Die Funktion feed_forward() bekommt einen Inputvektor als Argument, lässt diesen einmal   //
-// durch das neuronale Netz laufen und gibt dann einen Outputvektor zurück. Im trainierten  //
-// Zustand des Netzes erhält man mit dieser Funktion eine Lösung für eine Regressions- oder //
-// Klassifikationsaufgabe.                                                                  //
-//////////////////////////////////////////////////////////////////////////////////////////////
 // mathematisch //////////////////////////////////////////////////////////////////////////////
 double id(const double& x) {
     return x;
@@ -91,6 +93,12 @@ double softsign_derivative(const double& x) {
 }
 //////////////////////////////////////////////////////////////////////////////////////////////
 // Netzfunktionen ////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////
+// Die Funktion feed_forward() bekommt einen Inputvektor als Argument, lässt diesen einmal   //
+// durch das neuronale Netz laufen und gibt dann einen Outputvektor zurück. Im trainierten  //
+// Zustand des Netzes erhält man mit dieser Funktion eine Lösung für eine Regressions- oder //
+// Klassifikationsaufgabe.                                                                  //
+//////////////////////////////////////////////////////////////////////////////////////////////
 Matrix<double> NeuralNetwork::feed_forward(const Matrix<double>& input) const {
     Matrix<double> output = input;
     for (int i = 0; i < weights.size(); i++) {

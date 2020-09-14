@@ -6,7 +6,7 @@ int main(int argc, char** argv) {
 
 
 
-	NeuralNetwork n1(0.5, { 8,2,2,3,4,5,6,7,8 });
+	NeuralNetwork n1(0.5, { 8 , 4, 6, 2, 10 });
 	WeightMatrices ws = n1.get_weights();
 	for (auto& matrix : ws) {
 		matrix.print();
