@@ -1,6 +1,7 @@
 #include "NeuralNetwork.h"
 #include <algorithm>
-#define ACTIVATION sigmoid // Zur Verfügung stehen bisher "id", "sigmoid", "ReLU", "tanh" und "softsign".
+#define ACTIVATION sigmoid  // Zur Verfügung stehen bisher "id", "sigmoid", "ReLU", 
+                            //"tanh" und "softsign".
 #define ACTIVATION_DERIVATIVE apply_sigmoid_derivative
 //TODO: simoid-He-Initialisation; tanh-Xavier-Initialisation
 using Dimensions = std::vector<size_t>;
@@ -91,6 +92,15 @@ Matrix<double> apply_softsign_derivative(Matrix<double> matrix) {
     return matrix.map([](const double& val) -> double {return 1 / pow((1 + abs(val)), 2); });
 }
 //////////////////////////////////////////////////////////////////////////////////////////////
+// Print /////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////
+void NeuralNetwork::print() {
+    for (int i = 0; i < weights.size(); i++) {
+        std::cout << i + 1 << "te Gewichtungsmatrix: " << dimensions[i + 1] << "x" << dimensions[i] << "\n\n";
+        weights[i].print();
+    }
+}
+//////////////////////////////////////////////////////////////////////////////////////////////
 // Netzfunktionen ////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////
 // Die Funktion feed_forward() bekommt einen Inputvektor als Argument, lässt diesen einmal   //
@@ -108,22 +118,30 @@ Matrix<double> NeuralNetwork::feed_forward(const Matrix<double>& input) const {
 }
 //////////////////////////////////////////////////////////////////////////////////////////////
 // Die Funktion train() führt einmal die Funktion feed_forward() aus, vergleicht den        //
-// Outputvektor mit den Label des Datensatzes, berechnet daraus den Fehler E und passt dann //
+// Outputvektor mit dem Label des Datensatzes, berechnet daraus den Fehler E und passt dann //
 // mit Backpropagation die Gewichtungen und den Bias an.                                    //
 //////////////////////////////////////////////////////////////////////////////////////////////
 void NeuralNetwork::train(const Matrix<double>& input, const Matrix<double>& training_data) {
-    WeightMatrices outputs(dimensions.size()); // Pro Layer, ein Output
-    WeightMatrices errors(weights.size()); // Pro Gewichtungsmatrix, ein Fehler
-    outputs[0] = input; // Der erste Output ist der Input-Vektor;
-    for (int i = 0; i < outputs.size()-1; i++) {  // Feedforward, wobei die alle Outputs zwischengespeichert werden
+    WeightMatrices outputs(dimensions.size());      // Pro Layer, ein Output
+    WeightMatrices errors(weights.size());          // Pro Gewichtungsmatrix, ein Fehler
+    outputs[0] = input;                             // Der erste Output ist der Input-Vektor;
+    for (int i = 0; i < outputs.size()-1; i++) {    // Feedforward, wobei die alle Outputs 
+                                                    // zwischengespeichert werden
         outputs[i+1] = (weights[i] * outputs[i]) + biases[i]; 
         outputs[i+1].map(ACTIVATION); //
     }
 
-    errors[errors.size() - 1] = training_data - outputs[outputs.size()-1]; //der letzte Fehler ist E0 = Zielwerte minus dem letzten Output;
+    errors[errors.size() - 1] = training_data - outputs[outputs.size()-1]; 
+    //der letzte Fehler ist E = Zielwerte minus dem letzten Output
     for (int i = errors.size()-2; i >= 0; i--) {
-        errors[i] = weights[i + 1].transpose() * errors[i + 1]; // Error_i-1 = Gewichtungen_i^T * Error_i (Fehler-Backpropagation)
+        errors[i] = weights[i + 1].transpose() * errors[i + 1]; 
+        // Error_i-1 = Gewichtungen_i^T * Error_i (Fehler-Backpropagation)
     }
+//////////////////////////////////////////////////////////////////////////////////////////////
+// Der Fehler in vorhergehenden Schichten wird berechnet, indem der Fehler aus der Schicht  //
+// davor den Gewichtungen entsprechend aufgeteilt wird. Lässt man die Normierungskonstante  //
+// weg erhält man den Ausdruck: Error_(i-1) = Gewichtungen_(i)^T * Error_(i)                //
+//////////////////////////////////////////////////////////////////////////////////////////////
 
     for (int i = weights.size() - 1; i >= 0; i--) {
         
@@ -131,16 +149,10 @@ void NeuralNetwork::train(const Matrix<double>& input, const Matrix<double>& tra
         Matrix<double> delta_weights = delta_biases * outputs[i].transpose();
         biases[i] = delta_biases * learningrate;
         weights[i] += delta_weights * learningrate;
-        // analytischer Ausdruck zur Berechnung der Gewichtungsaktualisierung basierend auf dem Fehler in der 
-        // jeweiligen Schicht
+        // analytischer Ausdruck zur Berechnung der Gewichtungsaktualisierung basierend auf dem
+        // Fehler in der jeweiligen Schicht
         
-    }
-    std::cout << "trained;";
-    
-
-    
-
- 
+    } 
 }
 /********************************************************************************************/
 /*                                     GETTER & SETTER                                      */
@@ -153,8 +165,3 @@ WeightMatrices NeuralNetwork::get_weights() const {
 Dimensions NeuralNetwork::get_dimensions() const {
     return dimensions;
 }
-
-
-
-
-

@@ -9,6 +9,7 @@ public:
 //Konstruktoren
     NeuralNetwork(const double& learningrate, const Dimensions& dimensions);
 //Funktionen
+    void print();
     Matrix<double> feed_forward(const Matrix<double>& input) const;
     void train(const Matrix<double>& input, const Matrix<double>& training_data);
 //Getter & Setter
