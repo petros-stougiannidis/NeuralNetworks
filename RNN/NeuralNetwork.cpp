@@ -95,10 +95,13 @@ Matrix<double> apply_softsign_derivative(Matrix<double> matrix) {
 // Print /////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////
 void NeuralNetwork::print() {
-    for (int i = 0; i < weights.size(); i++) {
+    /*for (int i = 0; i < weights.size(); i++) {
         std::cout << i + 1 << "te Gewichtungsmatrix: " << dimensions[i + 1] << "x" << dimensions[i] << "\n\n";
         weights[i].print();
-    }
+    }*/
+    for (int i = 0; i < biases.size(); i++) {
+        biases[0].print();
+    } // show biases
 }
 //////////////////////////////////////////////////////////////////////////////////////////////
 // Netzfunktionen ////////////////////////////////////////////////////////////////////////////
@@ -147,7 +150,7 @@ void NeuralNetwork::train(const Matrix<double>& input, const Matrix<double>& tra
         
         Matrix<double> delta_biases = errors[i].hadamard(ACTIVATION_DERIVATIVE(outputs[i + 1]));
         Matrix<double> delta_weights = delta_biases * outputs[i].transpose();
-        biases[i] = delta_biases * learningrate;
+        biases[i] += delta_biases * learningrate;
         weights[i] += delta_weights * learningrate;
         // analytischer Ausdruck zur Berechnung der Gewichtungsaktualisierung basierend auf dem
         // Fehler in der jeweiligen Schicht
