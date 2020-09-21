@@ -25,6 +25,7 @@ public:
 	Matrix<T>& iota(const T &start);
 	Matrix<T>& randomize_int(const int min, const int max);
 	Matrix<T>& randomize_double(double min, double max);
+	Matrix<T> hadamard(const Matrix<T>& m2);
 //Getter
 	size_t get_rowdim() const;
 	size_t get_coldim() const;
@@ -144,6 +145,7 @@ Matrix<T>& Matrix<T>::map(T function (const T&)) {  // :: a -> a // BROKEN
 	}
 	return *this;
 }
+
 template<typename T>
 Matrix<T>& Matrix<T>::iota(const T& start) {
 	for (int i = 0; i < rowdim; i++) {
@@ -185,6 +187,26 @@ Matrix<T>& Matrix<T>::randomize_double(double min, double max) {
 	}
 	return *this;
 }
+template<typename T>
+Matrix<T> Matrix<T>::hadamard(const Matrix<T>& m2) {
+	try {
+		if (rowdim != m2.rowdim || coldim != m2.coldim) throw std::invalid_argument("Matrixdimensionen muessen uebereinstimmen\n");
+		Matrix<T> result(rowdim, coldim);
+		for (int i = 0; i < rowdim; i++) {
+			std::transform(
+				matrix[i].begin(),				//from
+				matrix[i].end(),				//to
+				m2.matrix[i].begin(),			//and
+				result.matrix[i].begin(),		//in
+				std::multiplies<T>());				//with
+		}
+		return result;
+	}
+	catch (std::invalid_argument& error) {
+		std::cerr << error.what() << std::endl;
+	}
+}
+
 
 /********************************************************************************************/
 /*                                       GETTER & SETTER                                    */

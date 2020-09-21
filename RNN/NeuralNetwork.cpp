@@ -1,8 +1,7 @@
-// Test Git_Username
 #include "NeuralNetwork.h"
 #include <algorithm>
 #define ACTIVATION sigmoid // Zur Verfügung stehen bisher "id", "sigmoid", "ReLU", "tanh" und "softsign".
-#define ACTIVATION_DERIVATIVE sigmoid_derivative
+#define ACTIVATION_DERIVATIVE apply_sigmoid_derivative
 //TODO: simoid-He-Initialisation; tanh-Xavier-Initialisation
 using Dimensions = std::vector<size_t>;
 using WeightMatrices = std::vector<Matrix<double>>;
@@ -11,7 +10,7 @@ using Biases = std::vector < Matrix<double>>;
 /*                               KONSTRUKTOR/DESTRUKTOR                                     */
 /********************************************************************************************/
 //////////////////////////////////////////////////////////////////////////////////////////////
-// Der Konstruktor bekommt zwei Argumente: die Lernrate und einen double-Vektoren, der die  //
+// Der Konstruktor bekommt zwei Argumente: die Lernrate und einen double-Vektor, der die  //
 // Dimension des neuronales Netzes angibt. Ein Vektor der Form {10,20,30,15} initialisiert  //
 // ein Netz mit 10 Inputneuronen, zwei Hidden Layer mit jeweils 20 und 30 Neuronen und 15   //
 // Outputneuronen.                                                                          //
@@ -36,7 +35,7 @@ NeuralNetwork::NeuralNetwork(const double& learningrate, const Dimensions& dimen
         }
 
         for (int i = 0; i < weights.size(); i++) {
-            biases[i] = Matrix<double>(dimensions[i + 1], 1);
+            biases[i] = Matrix<double>(dimensions[i + 1], 1); // 0 Anfangsgewichtung
         }
 
     } catch (std::invalid_argument& error) { std::cerr << error.what() << std::endl; }
@@ -66,30 +65,30 @@ NeuralNetwork::NeuralNetwork(const double& learningrate, const Dimensions& dimen
 double id(const double& x) {
     return x;
 }
-double id_derivative(const double& x) {
-    return 1;
+Matrix<double> apply_id_derivative(Matrix<double> matrix) {
+    return matrix.map([](const double& val) -> double {return 1; });
 }
 double sigmoid(const double& x) {
     return 1 / (1 + exp(-x));
 }
-double sigmoid_derivative(const double& x) {
-    return sigmoid(1 - sigmoid(x));
+Matrix<double> apply_sigmoid_derivative(Matrix<double> matrix) {
+    return matrix.map([](const double& val) {return sigmoid(val) * (1 - sigmoid(val)); });
 }
 double ReLU(const double& x) {
     return (0 <= x) ? x : 0;
 }
-double ReLU_derivative(const double& x) {
-    return (0 <= x) ? 1 : 0;
+Matrix<double> apply_ReLU_derivative(Matrix<double> matrix) {
+    return matrix.map([](const double& val) -> double {return (0 <= val) ? 1 : 0; });
 }
 //double tanh(const double& x) In cmath definiert
-double tanh_derivative(const double& x) {
-    return 1 - pow(tanh(x), 2);
+Matrix<double> apply_tanh_derivative(Matrix<double> matrix) {
+    return matrix.map([](const double& val) -> double {return 1 - pow(tanh(val), 2); });
 }
 double softsign(const double& x) {
     return x / (1 + abs(x));
 }
-double softsign_derivative(const double& x) {
-    return 1 / pow((1 + abs(x)), 2);
+Matrix<double> apply_softsign_derivative(Matrix<double> matrix) {
+    return matrix.map([](const double& val) -> double {return 1 / pow((1 + abs(val)), 2); });
 }
 //////////////////////////////////////////////////////////////////////////////////////////////
 // Netzfunktionen ////////////////////////////////////////////////////////////////////////////
@@ -102,7 +101,7 @@ double softsign_derivative(const double& x) {
 Matrix<double> NeuralNetwork::feed_forward(const Matrix<double>& input) const {
     Matrix<double> output = input;
     for (int i = 0; i < weights.size(); i++) {
-        output = (weights[i] * output) + biases[i];
+        output = (weights[i] * output) + biases[i];  //TODO:: BIASES
         output.map(ACTIVATION);
     }
     return  output;
@@ -113,8 +112,35 @@ Matrix<double> NeuralNetwork::feed_forward(const Matrix<double>& input) const {
 // mit Backpropagation die Gewichtungen und den Bias an.                                    //
 //////////////////////////////////////////////////////////////////////////////////////////////
 void NeuralNetwork::train(const Matrix<double>& input, const Matrix<double>& training_data) {
-    Matrix<double> E_0 = (feed_forward(input) - training_data);
-    E_0.map(ACTIVATION_DERIVATIVE);
+    WeightMatrices outputs(dimensions.size()); // Pro Layer, ein Output
+    WeightMatrices errors(weights.size()); // Pro Gewichtungsmatrix, ein Fehler
+    outputs[0] = input; // Der erste Output ist der Input-Vektor;
+    for (int i = 0; i < outputs.size()-1; i++) {  // Feedforward, wobei die alle Outputs zwischengespeichert werden
+        outputs[i+1] = (weights[i] * outputs[i]) + biases[i]; 
+        outputs[i+1].map(ACTIVATION); //
+    }
+
+    errors[errors.size() - 1] = training_data - outputs[outputs.size()-1]; //der letzte Fehler ist E0 = Zielwerte minus dem letzten Output;
+    for (int i = errors.size()-2; i >= 0; i--) {
+        errors[i] = weights[i + 1].transpose() * errors[i + 1]; // Error_i-1 = Gewichtungen_i^T * Error_i (Fehler-Backpropagation)
+    }
+
+    for (int i = weights.size() - 1; i >= 0; i--) {
+        
+        Matrix<double> delta_biases = errors[i].hadamard(ACTIVATION_DERIVATIVE(outputs[i + 1]));
+        Matrix<double> delta_weights = delta_biases * outputs[i].transpose();
+        biases[i] = delta_biases * learningrate;
+        weights[i] += delta_weights * learningrate;
+        // analytischer Ausdruck zur Berechnung der Gewichtungsaktualisierung basierend auf dem Fehler in der 
+        // jeweiligen Schicht
+        
+    }
+    std::cout << "trained;";
+    
+
+    
+
+ 
 }
 /********************************************************************************************/
 /*                                     GETTER & SETTER                                      */
