@@ -7,9 +7,9 @@ using WeightMatrices = std::vector<Matrix<double>>;
 int main(int argc, char** argv) {
 
 
-	DataConverter data1("C:\\Users\\petro\\c++\\datasets\\mnist_train_100.csv");
-	std::vector<std::string> v1 = data1.read_csv();
-	std::cout << v1[0];
+	//DataConverter data1("C:\\Users\\petro\\c++\\datasets\\mnist_train_100.csv");
+	//std::vector<std::string> v1 = data1.read_csv();
+	//std::cout << v1[0];
 
 	//Timer t;
 	//NeuralNetwork n1(0.3, { 3, 4, 3 });
