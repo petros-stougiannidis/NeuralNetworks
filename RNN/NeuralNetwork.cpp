@@ -7,15 +7,17 @@
 using Dimensions = std::vector<size_t>;
 using WeightMatrices = std::vector<Matrix<double>>;
 using Biases = std::vector < Matrix<double>>;
+
 /********************************************************************************************/
 /*                               KONSTRUKTOR/DESTRUKTOR                                     */
 /********************************************************************************************/
 //////////////////////////////////////////////////////////////////////////////////////////////
-// Der Konstruktor bekommt zwei Argumente: die Lernrate und einen double-Vektor, der die  //
+// Der Konstruktor bekommt zwei Argumente: die Lernrate und einen double-Vektor, der die    //
 // Dimension des neuronales Netzes angibt. Ein Vektor der Form {10,20,30,15} initialisiert  //
 // ein Netz mit 10 Inputneuronen, zwei Hidden Layer mit jeweils 20 und 30 Neuronen und 15   //
 // Outputneuronen.                                                                          //
 //////////////////////////////////////////////////////////////////////////////////////////////
+
 NeuralNetwork::NeuralNetwork(const double& learningrate, const Dimensions& dimensions)
     try :   learningrate(learningrate),
             dimensions(dimensions),
@@ -62,55 +64,69 @@ NeuralNetwork::NeuralNetwork(const double& learningrate, const Dimensions& dimen
 /********************************************************************************************/
 /*                                       FUNKTIONEN                                         */
 /********************************************************************************************/
+//////////////////////////////////////////////////////////////////////////////////////////////
 // mathematisch //////////////////////////////////////////////////////////////////////////////
+
 double id(const double& x) {
     return x;
 }
+
 Matrix<double> apply_id_derivative(Matrix<double> matrix) {
     return matrix.map([](const double& val) -> double {return 1; });
 }
+
 double sigmoid(const double& x) {
     return 1 / (1 + exp(-x));
 }
+
 Matrix<double> apply_sigmoid_derivative(Matrix<double> matrix) {
     return matrix.map([](const double& val) {return sigmoid(val) * (1 - sigmoid(val)); });
 }
+
 double ReLU(const double& x) {
     return (0 <= x) ? x : 0;
 }
+
 Matrix<double> apply_ReLU_derivative(Matrix<double> matrix) {
     return matrix.map([](const double& val) -> double {return (0 <= val) ? 1 : 0; });
 }
+
 //double tanh(const double& x) In cmath definiert
 Matrix<double> apply_tanh_derivative(Matrix<double> matrix) {
     return matrix.map([](const double& val) -> double {return 1 - pow(tanh(val), 2); });
 }
+
 double softsign(const double& x) {
     return x / (1 + abs(x));
 }
+
 Matrix<double> apply_softsign_derivative(Matrix<double> matrix) {
     return matrix.map([](const double& val) -> double {return 1 / pow((1 + abs(val)), 2); });
 }
+
 //////////////////////////////////////////////////////////////////////////////////////////////
-// Print /////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////
+// Print & Debugging /////////////////////////////////////////////////////////////////////////
+
 void NeuralNetwork::print() {
-    /*for (int i = 0; i < weights.size(); i++) {
+    for (int i = 0; i < weights.size(); i++) {
         std::cout << i + 1 << "te Gewichtungsmatrix: " << dimensions[i + 1] << "x" << dimensions[i] << "\n\n";
         weights[i].print();
-    }*/
-    for (int i = 0; i < biases.size(); i++) {
-        biases[0].print();
-    } // show biases
+    }
+    //for (int i = 0; i < biases.size(); i++) {
+    //    biases[0].print();
+    //} // show biases
 }
+
 //////////////////////////////////////////////////////////////////////////////////////////////
 // Netzfunktionen ////////////////////////////////////////////////////////////////////////////
+
 //////////////////////////////////////////////////////////////////////////////////////////////
-// Die Funktion feed_forward() bekommt einen Inputvektor als Argument, lässt diesen einmal   //
+// Die Funktion feed_forward() bekommt einen Inputvektor als Argument, lässt diesen einmal  //
 // durch das neuronale Netz laufen und gibt dann einen Outputvektor zurück. Im trainierten  //
 // Zustand des Netzes erhält man mit dieser Funktion eine Lösung für eine Regressions- oder //
 // Klassifikationsaufgabe.                                                                  //
 //////////////////////////////////////////////////////////////////////////////////////////////
+
 Matrix<double> NeuralNetwork::feed_forward(const Matrix<double>& input) const {
     Matrix<double> output = input;
     for (int i = 0; i < weights.size(); i++) {
@@ -119,11 +135,13 @@ Matrix<double> NeuralNetwork::feed_forward(const Matrix<double>& input) const {
     }
     return  output;
 }
+
 //////////////////////////////////////////////////////////////////////////////////////////////
 // Die Funktion train() führt einmal die Funktion feed_forward() aus, vergleicht den        //
 // Outputvektor mit dem Label des Datensatzes, berechnet daraus den Fehler E und passt dann //
 // mit Backpropagation die Gewichtungen und den Bias an.                                    //
 //////////////////////////////////////////////////////////////////////////////////////////////
+
 void NeuralNetwork::train(const Matrix<double>& input, const Matrix<double>& training_data) {
     WeightMatrices outputs(dimensions.size());      // Pro Layer, ein Output
     WeightMatrices errors(weights.size());          // Pro Gewichtungsmatrix, ein Fehler
@@ -157,14 +175,17 @@ void NeuralNetwork::train(const Matrix<double>& input, const Matrix<double>& tra
         
     } 
 }
+
 /********************************************************************************************/
 /*                                     GETTER & SETTER                                      */
 /********************************************************************************************/
 //////////////////////////////////////////////////////////////////////////////////////////////
 // Getter ////////////////////////////////////////////////////////////////////////////////////
+
 WeightMatrices NeuralNetwork::get_weights() const {
     return weights;
 }
+
 Dimensions NeuralNetwork::get_dimensions() const {
     return dimensions;
 }
