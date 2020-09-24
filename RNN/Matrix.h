@@ -14,6 +14,7 @@ class Matrix
 	static_assert(std::is_arithmetic_v<T>, "Unzulaessiger Typ fuer die Matrixinstanz\n");
 public:
 //Konstruktoren
+	// TODO!!!! MOVE KONSTRUKTOR
 	Matrix<T>();
 	Matrix<T>(const std::vector<std::vector<T>>& matrix);
 	Matrix<T>(const size_t& row, const size_t& col);
