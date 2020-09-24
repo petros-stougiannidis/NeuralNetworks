@@ -4,10 +4,11 @@
 #include <string>
 #include <vector>
 #include <exception>
+#include <tuple>
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // Klasse: DataConverter																	//
-// Bereitet Datensätze und/oder andere externe Date0 für eine Verarbeitung in einem neuro-  //
+// Bereitet Datensï¿½tze und/oder andere externe Date0 fï¿½r eine Verarbeitung in einem neuro-  //
 // nalen Netzvor.																			//
 // TODO::	- Funktion zum Einlesen von Daten												//
 //			- Funktionen zum Formatieren der Daten (Verktor mit Input, Vektor mit Labels)	//

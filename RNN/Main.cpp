@@ -4,12 +4,19 @@
 #include "DataConverter.h"
 
 using WeightMatrices = std::vector<Matrix<double>>;
+//using namespace std;
 int main(int argc, char** argv) {
 
 
 	//DataConverter data1("C:\\Users\\petro\\c++\\datasets\\mnist_train_100.csv");
 	//std::vector<std::string> v1 = data1.read_csv();
 	//std::cout << v1[0];
+	
+	//***********************************************************
+	//Max Testing:
+	// DataConverter data1("mini_test.csv");
+	// std::vector<std::string> v1 = data1.read_csv();
+	// std::cout << v1[1] << std::endl;
 
 	//Timer t;
 	//NeuralNetwork n1(0.3, { 3, 4, 3 });
