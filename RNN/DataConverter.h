@@ -6,6 +6,14 @@
 #include <exception>
 #include <tuple>
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Enum: ParseConvention																										//
+// Für vereinfachte Auswahl von verschiedenen Zeilen-Parser-Funktionen; beliebig erweiterba										//	
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+enum class ParseConvention {
+	LabelandInput //Label und Input getrennt
+};
+
 //////////////////////////////////////////////////////////////////////////////////////////////
 // Klasse: DataConverter																	//
 // Bereitet Datens�tze und/oder andere externe Date0 f�r eine Verarbeitung in einem neuro-  //
@@ -17,9 +25,9 @@
 class DataConverter
 {
 public:
-	DataConverter(const std::string& path);
-	std::vector<std::string> get_labels() const;
-	std::vector<std::string> get_values() const;
+	DataConverter(const std::string& path, ParseConvention);
+	std::vector<double> get_labels() const;
+	std::vector<std::vector< double>> get_values() const;
 private:
 	std::string path;
 	std::vector<double> labels;

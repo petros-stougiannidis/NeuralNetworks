@@ -16,9 +16,12 @@ int main(int argc, char** argv) {
 	
 	//***********************************************************
 	//Max Testing:
-	// DataConverter data1("mini_test.csv");
-	// std::vector<std::string> v1 = data1.read_csv();
-	// std::cout << v1[1] << std::endl;
+	// DataConverter data1("mnist_test_10.csv", ParseConvention::LabelandInput);
+	// std::vector<double> v1 = data1.get_labels();
+	// std::cout << v1[2] << std::endl;
+
+	// std::vector<std::vector<double>> v2 = data1.get_values();
+	// std::cout << v2[0][14] << std::endl;
 
 	//Timer t;
 	//NeuralNetwork n1(0.3, { 3, 4, 3 });
