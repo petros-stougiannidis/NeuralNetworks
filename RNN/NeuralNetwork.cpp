@@ -34,7 +34,7 @@ NeuralNetwork::NeuralNetwork(const double& learningrate, const Dimensions& dimen
 
         for (int i = 0; i < weights.size(); i++) {
             weights[i] = Matrix<double>(dimensions[i + 1], dimensions[i], 0);
-            weights[i].randomize_double(-1 / sqrt(dimensions[i]), 1 / sqrt(dimensions[i]));
+            weights[i].randomize_double(-1 / sqrt(dimensions[i]), 1 / sqrt(dimensions[i])); // times small scalar???
         }
 
         for (int i = 0; i < weights.size(); i++) {
@@ -104,6 +104,11 @@ Matrix<double> apply_softsign_derivative(Matrix<double> matrix) {
     return matrix.map([](const double& val) -> double {return 1 / pow((1 + abs(val)), 2); });
 }
 
+Matrix<double> mean_squared_error(const Matrix<double>& y, const Matrix<double>& y_hat) {
+    Matrix<double> result;
+    result = ((y - y_hat).map([](const double& val) -> double {return pow(val, 2); }))*0.5;
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////
 // Print & Debugging /////////////////////////////////////////////////////////////////////////
 
@@ -155,7 +160,7 @@ void NeuralNetwork::train(const Matrix<double>& input, const Matrix<double>& tra
     errors[errors.size() - 1] = training_data - outputs[outputs.size()-1]; 
     //der letzte Fehler ist E = Zielwerte minus dem letzten Output
     for (int i = errors.size()-2; i >= 0; i--) {
-        errors[i] = weights[i + 1].transpose() * errors[i + 1]; 
+        errors[i] = weights[i + 1].transpose() * errors[i + 1]; //TODO:: .* activation'(z(i+1)) ????
         // Error_i-1 = Gewichtungen_i^T * Error_i (Fehler-Backpropagation)
     }
 //////////////////////////////////////////////////////////////////////////////////////////////
