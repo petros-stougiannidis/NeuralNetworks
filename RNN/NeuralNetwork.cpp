@@ -117,9 +117,6 @@ void NeuralNetwork::print() {
         std::cout << i + 1 << "te Gewichtungsmatrix: " << dimensions[i + 1] << "x" << dimensions[i] << "\n\n";
         weights[i].print();
     }
-    //for (int i = 0; i < biases.size(); i++) {
-    //    biases[0].print();
-    //} // show biases
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -155,10 +152,8 @@ void NeuralNetwork::train(const Matrix<double>& input, const Matrix<double>& tra
     for (int i = 0; i < outputs.size()-1; i++) {    // Feedforward, wobei die alle Outputs 
                                                     // zwischengespeichert werden
         outputs[i + 1] = (weights[i] * outputs[i]) + biases[i];
-        outputs[i + 1].map(ACTIVATION); //
+        outputs[i + 1].map(ACTIVATION);
     }
-    //input.print();
-    //outputs[outputs.size() - 1].print(); // DEBBUGGING
 
     errors[errors.size() - 1] = training_data - outputs[outputs.size()-1]; 
     //der letzte Fehler ist E = Zielwerte minus dem letzten Output
@@ -174,7 +169,7 @@ void NeuralNetwork::train(const Matrix<double>& input, const Matrix<double>& tra
 
     for (int i = weights.size() - 1; i >= 0; i--) {
         
-        Matrix<double> delta_biases = errors[i].hadamard(apply_sigmoid_derivative(outputs[i+1]));
+        Matrix<double> delta_biases = errors[i].hadamard(ACTIVATION_DERIVATIVE(outputs[i+1]));
         Matrix<double> delta_weights = delta_biases * outputs[i].transpose();
         biases[i] += delta_biases * learningrate;
         weights[i] += delta_weights * learningrate;
