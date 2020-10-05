@@ -79,8 +79,8 @@ double sigmoid(const double& x) {
     return 1 / (1 + exp(-x));
 }
 
-Matrix<double> apply_sigmoid_derivative(Matrix<double> matrix) {
-    return matrix.map([](const double& val) {return sigmoid(val) * (1 - sigmoid(val)); });
+Matrix<double> apply_sigmoid_derivative(Matrix<double> matrix) { 
+    return matrix.map([](const double& val) {return val * (1 - val); });
 }
 
 double ReLU(const double& x) {
@@ -135,7 +135,7 @@ void NeuralNetwork::print() {
 Matrix<double> NeuralNetwork::feed_forward(const Matrix<double>& input) const {
     Matrix<double> output = input;
     for (int i = 0; i < weights.size(); i++) {
-        output = (weights[i] * output) + biases[i];  //TODO:: BIASES
+        output = (weights[i] * output) + biases[i];
         output.map(ACTIVATION);
     }
     return  output;
@@ -148,14 +148,17 @@ Matrix<double> NeuralNetwork::feed_forward(const Matrix<double>& input) const {
 //////////////////////////////////////////////////////////////////////////////////////////////
 
 void NeuralNetwork::train(const Matrix<double>& input, const Matrix<double>& training_data) {
+
     WeightMatrices outputs(dimensions.size());      // Pro Layer, ein Output
     WeightMatrices errors(weights.size());          // Pro Gewichtungsmatrix, ein Fehler
     outputs[0] = input;                             // Der erste Output ist der Input-Vektor;
     for (int i = 0; i < outputs.size()-1; i++) {    // Feedforward, wobei die alle Outputs 
                                                     // zwischengespeichert werden
-        outputs[i+1] = (weights[i] * outputs[i]) + biases[i]; 
-        outputs[i+1].map(ACTIVATION); //
+        outputs[i + 1] = (weights[i] * outputs[i]) + biases[i];
+        outputs[i + 1].map(ACTIVATION); //
     }
+    //input.print();
+    //outputs[outputs.size() - 1].print(); // DEBBUGGING
 
     errors[errors.size() - 1] = training_data - outputs[outputs.size()-1]; 
     //der letzte Fehler ist E = Zielwerte minus dem letzten Output
@@ -171,7 +174,7 @@ void NeuralNetwork::train(const Matrix<double>& input, const Matrix<double>& tra
 
     for (int i = weights.size() - 1; i >= 0; i--) {
         
-        Matrix<double> delta_biases = errors[i].hadamard(ACTIVATION_DERIVATIVE(outputs[i + 1]));
+        Matrix<double> delta_biases = errors[i].hadamard(apply_sigmoid_derivative(outputs[i+1]));
         Matrix<double> delta_weights = delta_biases * outputs[i].transpose();
         biases[i] += delta_biases * learningrate;
         weights[i] += delta_weights * learningrate;
@@ -193,4 +196,8 @@ WeightMatrices NeuralNetwork::get_weights() const {
 
 Dimensions NeuralNetwork::get_dimensions() const {
     return dimensions;
+}
+
+Biases NeuralNetwork::get_biases() const {
+    return biases;
 }

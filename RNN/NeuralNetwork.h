@@ -15,6 +15,7 @@ public:
 //Getter & Setter
     WeightMatrices get_weights() const;
     Dimensions get_dimensions() const;
+    Biases get_biases() const;
 private:
     double learningrate;
     Dimensions dimensions;

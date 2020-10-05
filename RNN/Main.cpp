@@ -2,45 +2,80 @@
 #include "Matrix.h"
 #include "Timer.h"
 #include "DataConverter.h"
+#define TRAINSIZE 60000
+#define TESTSIZE 10000
+#define EPOCHS 1
 
 using WeightMatrices = std::vector<Matrix<double>>;
-//using namespace std;
+void log(const std::string& msg) {
+	std::cout << msg << std::endl;
+}
+
 int main(int argc, char** argv) {
 
+///////////////////////////////////////////////////////////////////////
+// Testdatensatz zur Erlernung der XOR Funktion
 
-	//DataConverter data1("C:\\Users\\petro\\c++\\datasets\\mnist_train_100.csv");
-	////std::vector<std::string> v1 = data1.read_csv();
-	//std::cout << v1[0] << "\n\n";
-	//std::cout << v1[1];
 
+///////////////////////////////////////////////////////////////////////
+// Initialisere Inputvektoren mit zwei zufälligen Bits
+	Timer t;
+	log("initialize training data");
+	std::vector<Matrix<double>> training_data_set(TRAINSIZE, Matrix<double>(2,1));
+	for (Matrix<double>& m : training_data_set) {
+		m.randomize_int(0,1);
+	}
+///////////////////////////////////////////////////////////////////////
+// Berechne Labelvektoren mit der XOR-Operation
+	std::vector<Matrix<double>> training_labels(TRAINSIZE, Matrix<double>(1, 1));
+	for (int i = 0; i < training_labels.size(); i++) {
+		int a = (int) training_data_set[i].get_value(0, 0);
+		int b = (int) training_data_set[i].get_value(1, 0);
+		training_labels[i].set_value(0, 0, a ^ b);
 	
-	//***********************************************************
-	//Max Testing:
-	// DataConverter data1("mnist_test_10.csv", ParseConvention::LabelandInput);
-	// std::vector<double> v1 = data1.get_labels();
-	// std::cout << v1[2] << std::endl;
+	}
+	std::cout << "~~ " << t.elapsed_time<ms>() << " ms" << std::endl;
 
-	// std::vector<std::vector<double>> v2 = data1.get_values();
-	// std::cout << v2[0][14] << std::endl;
+///////////////////////////////////////////////////////////////////////
+// Erstelle Testdatensatz nach dem selben Prinzip
+	t.reset();
+	log("initialize test data");
+	std::vector<Matrix<double>> test_data_set(TESTSIZE, Matrix<double>(2, 1));
+	for (Matrix<double>& m : test_data_set) {
+		m.randomize_int(0, 1);
+	}
+	std::vector<Matrix<double>> test_labels(TESTSIZE, Matrix<double>(1, 1));
+	for (int i = 0; i < test_labels.size(); i++) {
+		int a = (int)test_data_set[i].get_value(0, 0);
+		int b = (int)test_data_set[i].get_value(1, 0);
+		test_labels[i].set_value(0, 0, (double) (a ^ b));
+	
+	}
+	std::cout << "~~ " << t.elapsed_time<ms>() << " ms" << std::endl;
+	
+///////////////////////////////////////////////////////////////////////
+// Initialisre Netz mit Lernrate 0.1, zwei Inputs und einem Ouput
+	NeuralNetwork n1(0.1, { 2,2,1 });
 
-	//Timer t;
-	//NeuralNetwork n1(0.3, { 3, 4, 3 });
-	//n1.print();
-	//std::cout << "took " << t.elapsed_time<ms>() << " milliseconds to initialize.\n\n" << std::endl;
+///////////////////////////////////////////////////////////////////////
+// Trainiere Netz EPOCHS mal am Trainingsdatensatz
+	log("start training");
+	t.reset();
+	for (int epochs = 0; epochs < EPOCHS; epochs++) {
+		for (int i = 0; i < TRAINSIZE; i++) {
+			n1.train(training_data_set[i], training_labels[i]);
+		}
+	}
+	std::cout << "~~ " << t.elapsed_time<ms>() << " ms" << std::endl;
 
-	//Matrix<double> input(3, 1, 0);
-	//Matrix<double> data(3, 1, 1);
-	////input.randomize_double(0,1);
-	//t.reset();
-	//for (int i = 0; i < 1000; i++) {
-	//	n1.train(input, data);
-	//	//std::cout << i << std::endl;
-	//	//n1.print();
-	//}	
-	//std::cout << "trained for " << t.elapsed_time<s>() << " seconds.\n\n";
-	//
-	//std::cout << "Ergebnis: ";
-	//input.print();
-	//n1.feed_forward(input).print();
-	////std::vector<NeuralNetwork>(10, NeuralNetwork(0.5, { 8,2,2,3,4,5,6,7,8 }));
+///////////////////////////////////////////////////////////////////////
+// Messung der Erfolgsrate am Testdatensatz
+	int success = 0;
+	for (int i = 0; i < TESTSIZE; i++) {
+		Matrix<double> erg = n1.feed_forward(test_data_set[i]);
+		if (abs((erg.get_value(0, 0) - test_labels[i].get_value(0, 0)) < 0.2)) {
+			success++;
+		}
+	}
+	std::cout << "successrate = " << success / TESTSIZE *100 << "%";
 }

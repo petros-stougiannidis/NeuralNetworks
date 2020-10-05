@@ -165,7 +165,7 @@ Matrix<T>& Matrix<T>::randomize_int(const int min, const int max) {
 	std::uniform_int_distribution<int> dist(min, max);
 	for (int i = 0; i < rowdim; i++) {
 		for (int j = 0; j < coldim; j++) {
-			matrix[i][j] = dist(seed);
+			matrix[i][j] = (double) dist(seed);
 		}
 		
 	}
