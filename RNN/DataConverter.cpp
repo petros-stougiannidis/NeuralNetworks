@@ -1,58 +1,62 @@
 #include "DataConverter.h"
 
+using String = std::string;
+DataConverter::DataConverter(const std::string& path) {
+	this->path = path;
+	std::ifstream file;
+	file.open(path);
+	if (file.is_open()) {
+		String temp_line;
+		String temp_val;
+		std::vector<std::vector<String>> data;
+		std::vector<String> labels;
+		std::vector<String> vals;
 
-std::tuple<double, std::vector<double> > labelandInput (const std::string &row) {
-	std::string s_label, s_values;
-	std::tie(s_label, s_values) = std::make_tuple(row.substr(0,1), row.substr(1, row.length()));
+		while (file.good()) {
+			std::getline(file, temp_line);
+			std::stringstream sstream(temp_line);
+			String label;
+			std::getline(sstream, label, ',');
+			labels.push_back(label);
+			while (sstream.good()) {
+				std::getline(sstream, temp_val, ',');
+				vals.push_back(temp_val);
+			}
+			data.push_back(vals);
+			vals.clear();
+		}
+		file.close();
+		labels.pop_back();
+		data.pop_back();
 
-	std::vector<double> values;
-	for(char c : s_values) {
-		if (c != ',') values.push_back(c - '0');
+		std::vector<Matrix<double>> erg_data;
+		std::vector<Matrix<double>> erg_labels;
+
+		for (int i = 0; i < data.size(); i++) {
+			std::vector<double> temp;
+			for (int j = 0; j < data[i].size(); j++) {
+				temp.push_back(std::stod(data[i][j]));
+			}
+			erg_data.push_back(Matrix<double>(temp));
+		}
+	
+		for (int i = 0; i < labels.size(); i++) {
+			erg_labels.push_back(Matrix<double>(10,1).set_value(std::stod(labels[i]), 0, 1));
+		}
+
+
+		this->values = erg_data;
+		this->labels = erg_labels;
 	}
-
-	double label = 100.0;
-	for(char c : s_label) {
-		if (c != ',') label = c - '0';
-	}
-
-	return std::make_tuple(label,values);
-}
-
-
-std::vector<double> DataConverter::get_labels() const {
-	 return labels;
-}
-std::vector<std::vector< double> > DataConverter::get_values() const {
-	return values;
-}
-
-DataConverter::DataConverter(const std::string& path, ParseConvention parsing=ParseConvention::LabelandInput) {
-	std::ifstream input;
-	input.open(path);
-
-	if (!input.is_open()) {
-		std::cout << "Could not open!" << std::endl;
+	else {
+		std::cout << "FAILURE";
 		exit(0);
 	}
+}
 
-	//Parsing entsprechend der ParsingConvention
-	std::string string;
-	std::vector<std::string> lines;
-
-	switch (parsing) {
-		case ParseConvention::LabelandInput :
-			while(std::getline(input, string)) {
-				double label;
-				std::vector<double> value;
-				std::tie(label, value) = labelandInput(string);
-				labels.push_back(label);
-				values.push_back(value);
-			}
-			break;
-		default:
-			labels = {}; //leerer vector
-			values = {};
-			break;
-	}
-	input.close();
+const std::vector<Matrix<double>>& DataConverter::get_labels() const {
+	return labels;
+}
+const std::vector<Matrix<double>>& DataConverter::get_values() const {
+	return values;
 }

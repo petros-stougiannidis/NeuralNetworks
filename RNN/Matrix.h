@@ -17,6 +17,7 @@ public:
 	// TODO!!!! MOVE KONSTRUKTOR
 	Matrix<T>();
 	Matrix<T>(const std::vector<std::vector<T>>& matrix);
+	Matrix<T>(const std::vector<T>& matrix);
 	Matrix<T>(const size_t& row, const size_t& col);
 	Matrix<T>(const size_t& row, const size_t& col, const T& val);
 //Funktionen auf Matrizen
@@ -84,6 +85,19 @@ Matrix<T>::Matrix(const std::vector<std::vector<T>>& vec) : rowdim(vec.size()), 
 		std::cerr << error.what() << std::endl;
 	}
 	
+}
+template<typename T>
+Matrix<T>::Matrix(const std::vector<T>& vec) : rowdim(vec.size()), coldim(1), matrix(std::vector<std::vector<double>>(vec.size(), std::vector<double>(1))) {
+	try {
+		if (rowdim < 1 || coldim < 1) throw std::invalid_argument("Matrix muss mindestes die Dimension 1x1 haben");
+		for (int i = 0; i < rowdim; i++) {
+				matrix[i][0] = vec[i];
+		}
+	}
+	catch (std::invalid_argument& error) {
+		std::cerr << error.what() << std::endl;
+	}
+
 }
 template<typename T>
 Matrix<T>::Matrix(const size_t& row, const size_t& col) : rowdim(row), coldim(col), matrix(std::vector<std::vector<T>>(row, std::vector<T>(col))) {
