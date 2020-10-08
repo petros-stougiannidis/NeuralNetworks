@@ -26,9 +26,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Matrix.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="NeuralNetwork.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
@@ -36,6 +33,9 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="Timer.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="Matrix.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
