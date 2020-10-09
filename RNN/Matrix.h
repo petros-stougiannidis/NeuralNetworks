@@ -16,19 +16,21 @@ private:
 	std::vector<T> elements;
 
 public:
-	//Konstruktoren
+	//Konstruktoren & Destruktor
 	Matrix<T>() = default;
 	Matrix<T>(const len& rows, const len& columns); //construct Matrix and fill with 0
 	Matrix<T>(const len& rows, const len& columns, const T& value); //construct Matrix and fill with start value
-	Matrix<T>(const len& rows, const len& columns, const std::vector<T>& vector); //construct Matrix out if existing Vector by copying
-	Matrix<T>(const len& rows, const len& columns, std::vector<T>&& to_be_moved); //construct Matrix out if existing Vector without copying and leaving the vector as hollow object
-	Matrix<T>(const Matrix<T>& to_be_copied) = default;
-	Matrix<T>(Matrix<T>&& to_be_moved) = default;
+	Matrix<T>(const len& rows, const len& columns, const std::vector<T>& vector); //construct Matrix out of existing Vector by copying
+	Matrix<T>(const len& rows, const len& columns, std::vector<T>&& to_be_moved); //construct Matrix out of existing Vector without copying and leaving the vector as hollow object
 	~Matrix() = default;
 
+	//Move & Copy Konstruktoren
+	Matrix<T>(const Matrix<T>& to_be_copied);
+	Matrix<T>(Matrix<T>&& to_be_moved);
+
 	//Copy & Move Assignment
-	Matrix<T>& operator=(const Matrix<T>& m2) = default;
-	Matrix<T>& operator=(Matrix<T>&& m2) = default;
+	Matrix<T>& operator=(const Matrix<T>& m2);
+	Matrix<T>& operator=(Matrix<T>&& m2);
 
 	//Getter & Setter
 	len get_rows() const;
@@ -90,7 +92,7 @@ catch (std::invalid_argument& error) {
 GENERIC Matrix<T>::Matrix(const len& rows, const len& columns, const std::vector<T>& vector)
 try : rows(rows), columns(columns) {
 	if (rows < 1 || columns < 1) throw std::invalid_argument("+++ ERROR: invalid dimensions +++");
-	if (rows * columns != vector.size()) throw std::invalid_argument("+++ ERROR: dimension dont match vector length +++");
+	if (rows * columns != vector.size()) throw std::invalid_argument("+++ ERROR: dimensions dont match vector length +++");
 	this->elements = vector;
 }
 catch (std::invalid_argument& error) {
@@ -99,11 +101,34 @@ catch (std::invalid_argument& error) {
 GENERIC Matrix<T>::Matrix(const len& rows, const len& columns, std::vector<T>&& to_be_moved)
 try : rows(rows), columns(columns) {
 	if (rows < 1 || columns < 1) throw std::invalid_argument("+++ ERROR: invalid dimensions +++");
-	if (rows * columns != to_be_moved.size()) throw std::invalid_argument("+++ ERROR: dimension dont match vector length +++");
+	if (rows * columns != to_be_moved.size()) throw std::invalid_argument("+++ ERROR: dimensions dont match vector length +++");
 	this->elements = std::move(to_be_moved);
 }
 catch (std::invalid_argument& error) {
 	std::cerr << error.what() << std::endl;
+}
+
+GENERIC Matrix<T>::Matrix(const Matrix<T>& to_be_copied) 
+	: rows(to_be_copied.rows), columns(to_be_copied.columns), elements(std::vector<T>(to_be_copied.elements)){
+	std::cout << "copy constructor!" << std::endl;
+}
+GENERIC Matrix<T>::Matrix(Matrix<T>&& to_be_moved)
+	: rows(std::move(to_be_moved.rows)), columns(std::move(to_be_moved.columns)), elements(std::move(to_be_moved.elements)){
+	std::cout << "move constructor!" << std::endl;
+}
+GENERIC Matrix<T>& Matrix<T>::operator=(const Matrix<T>& m2) {
+	rows = m2.rows;
+	columns = m2.columns;
+	elements = m2.elements;
+	std::cout << "copy assignment!" << std::endl;
+	return *this;
+}
+GENERIC Matrix<T>& Matrix<T>::operator=(Matrix<T>&& m2) {
+	rows = std::move(m2.rows);
+	columns = std::move(m2.columns);
+	elements = std::move(m2.elements);
+	std::cout << "move assignment!" << std::endl;
+	return *this;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
