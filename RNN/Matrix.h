@@ -9,7 +9,8 @@ using len = int;
 
 GENERIC class Matrix {
 	static_assert(std::is_arithmetic_v<T>, "+++ ERROR: matrix must contain arithmetic datatype +++\n\n"); //Matrixklasse für arithmetische Datentypen (int, float, double etc.)
-
+	//static int move_count = 0;
+	//static int copy_count = 0;
 private:
 	len rows;
 	len columns;
@@ -68,6 +69,7 @@ public:
 	Matrix<T>& randomize_int(const int min, const int max);
 	Matrix<T>& randomize_double(double min, double max);
 	Matrix<T> hadamard(const Matrix<T>& m2);
+
 };
 //////////////////////////////////////////////////////////////////////////////////////////////
 //  KONSTRUKTOREN  ///////////////////////////////////////////////////////////////////////////
@@ -77,6 +79,7 @@ GENERIC Matrix<T>::Matrix(const len& rows, const len& columns)
 try : rows(rows), columns(columns) {
 	if (rows < 1 || columns < 1) throw std::invalid_argument("+++ ERROR: invalid dimensions +++");
 	this->elements = std::move(std::vector<T>(rows * columns));
+	//std::cout << "constructor 1!" << std::endl;
 }
 catch (std::invalid_argument& error) {
 	std::cerr << error.what() << std::endl;
@@ -85,6 +88,7 @@ GENERIC Matrix<T>::Matrix(const len& rows, const len& columns, const T& value)
 try : rows(rows), columns(columns) {
 	if (rows < 1 || columns < 1) throw std::invalid_argument("+++ ERROR: invalid dimensions +++");
 	this->elements = std::move(std::vector<T>(rows * columns, value));
+	//std::cout << "constructor2!" << std::endl;
 }
 catch (std::invalid_argument& error) {
 	std::cerr << error.what() << std::endl;
@@ -94,6 +98,7 @@ try : rows(rows), columns(columns) {
 	if (rows < 1 || columns < 1) throw std::invalid_argument("+++ ERROR: invalid dimensions +++");
 	if (rows * columns != vector.size()) throw std::invalid_argument("+++ ERROR: dimensions dont match vector length +++");
 	this->elements = vector;
+	//std::cout << "copied vector into matrix!" << std::endl;
 }
 catch (std::invalid_argument& error) {
 	std::cerr << error.what() << std::endl;
@@ -103,6 +108,7 @@ try : rows(rows), columns(columns) {
 	if (rows < 1 || columns < 1) throw std::invalid_argument("+++ ERROR: invalid dimensions +++");
 	if (rows * columns != to_be_moved.size()) throw std::invalid_argument("+++ ERROR: dimensions dont match vector length +++");
 	this->elements = std::move(to_be_moved);
+	//std::cout << "moved vector into matrix!" << std::endl;
 }
 catch (std::invalid_argument& error) {
 	std::cerr << error.what() << std::endl;
@@ -110,24 +116,28 @@ catch (std::invalid_argument& error) {
 
 GENERIC Matrix<T>::Matrix(const Matrix<T>& to_be_copied) 
 	: rows(to_be_copied.rows), columns(to_be_copied.columns), elements(std::vector<T>(to_be_copied.elements)){
-	std::cout << "copy constructor!" << std::endl;
+	//std::cout << "copy constructor!" << std::endl;
+	//copy_count++;
 }
 GENERIC Matrix<T>::Matrix(Matrix<T>&& to_be_moved)
 	: rows(std::move(to_be_moved.rows)), columns(std::move(to_be_moved.columns)), elements(std::move(to_be_moved.elements)){
-	std::cout << "move constructor!" << std::endl;
+	//std::cout << "move constructor!" << std::endl;
+	//move_count++;
 }
 GENERIC Matrix<T>& Matrix<T>::operator=(const Matrix<T>& m2) {
 	rows = m2.rows;
 	columns = m2.columns;
 	elements = m2.elements;
-	std::cout << "copy assignment!" << std::endl;
+	//std::cout << "copy assignment!" << std::endl;
+	//copy_count++;
 	return *this;
 }
 GENERIC Matrix<T>& Matrix<T>::operator=(Matrix<T>&& m2) {
 	rows = std::move(m2.rows);
 	columns = std::move(m2.columns);
 	elements = std::move(m2.elements);
-	std::cout << "move assignment!" << std::endl;
+	//std::cout << "move assignment!" << std::endl;
+	//move_count++;
 	return *this;
 }
 
@@ -330,6 +340,7 @@ GENERIC Matrix<T>& Matrix<T>::operator+=(const Matrix<T>& m2) {
 		std::cerr << error.what() << std::endl;
 	}
 }
+
 GENERIC Matrix<T> Matrix<T>::operator+(const T& scalar) const {
 	std::vector<T> result;
 	result.reserve(rows * columns);
