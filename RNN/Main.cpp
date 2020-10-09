@@ -1,6 +1,7 @@
 #include "NeuralNetwork.h"
 #include "Matrix.h"
 #include "Timer.h"
+#include "PercentageBar.h"
 
 #include "DataConverter.h "
 
@@ -9,8 +10,8 @@
 #define EPOCHS 1
 #define INPUTSIZE 784
 #define OUTPUTSIZE 10
-#define TOPOLOGY {784,400,200,10}
-#define LEARNINGRATE 0.01
+#define TOPOLOGY {784,10,10}
+#define LEARNINGRATE 0.1
 #define PATH_TRAIN "mnist_train.csv"
 #define PATH_TEST "mnist_test.csv"
 
@@ -20,62 +21,75 @@
 #define test_data_set data_test.get_values()
 #define test_labels data_test.get_labels()
 
-len max_pos(const Matrix<double>& vec) {
-	if (vec.get_rows() == 0) return 0;
-	if (vec.get_rows() == 1) return 0;
-	len pos = 0;
-	double elem = vec.get_value(0,0);
-	for (int i = 1; i < vec.get_rows(); i++) {
-		if (vec.get_value(i,0) > elem) {
-			pos = i;
-			elem = vec.get_value(i,0);
-		}
-	}
-	return pos;
-}
+
 
 void log(const std::string& msg) {
 	std::cout << msg << std::endl;
 }
 
-int main(int argc, char** argv) {
-
-	log("read data"); Timer t;
+int main(int argc, char** argv) {	
 
 	DataConverter data_train(PATH_TRAIN, TRAINSIZE, INPUTSIZE, OUTPUTSIZE);
 	DataConverter data_test(PATH_TEST, TESTSIZE, INPUTSIZE, OUTPUTSIZE);
 
-	std::cout << "~~ " << t.elapsed_time<ms>() << " in ms" << std::endl;
-
 	NeuralNetwork n1(LEARNINGRATE, TOPOLOGY);
 
-	log("start training"); t.reset();
+	Timer timer;
+	PercentageBar percentage_bar;
 
+	log("training progress"); 
+	timer.reset();
+
+	int training_iterations = 0;
 	for (int epochs = 0; epochs < EPOCHS; epochs++) {
 		for (int i = 0; i < TRAINSIZE; i++) {
 			n1.train(training_data_set[i], training_labels[i]);
-			//std::cout << i << std::endl;
+			percentage_bar.print_progress(training_iterations, TRAINSIZE * EPOCHS);
+			training_iterations++;
 		}
 	}
+	timer.print_time<s>();
+	percentage_bar.reset();
 
-	std::cout << "~~ " << t.elapsed_time<ms>() << " ms" << std::endl;
-	std::cout << "\a";
+	log("testing progress");
+	timer.reset();
 
-	 int success = 0;
-
+	double success = 0;
+	int test_iteration = 0;
 	for (int i = 0; i < TESTSIZE; i++) {
 		Matrix<double> erg = n1.feed_forward(test_data_set[i]);
-		if (max_pos(erg) == max_pos(test_labels[i])) {
+		if (erg.max_position() == test_labels[i].max_position()) {
 			success++;
 		}
-		/*erg.print();
-		test_labels[i].print();*/
+		percentage_bar.print_progress(test_iteration, TESTSIZE);
+		test_iteration++;
 
 	}
-
-
-
-	std::cout << "successrate = " << (success*100/TESTSIZE)  << "%" << std::endl;
+	timer.print_time<ms>();
+	std::cout << "successrate = " << (success * 100 / TESTSIZE) << "%" << std::endl;
 
 }
+//	int step = 1;
+//	int displayNext = step;
+//	int percent = 0;
+//	#define hund 1000000000
+//	std::cout << "Processing " << hund << " images..." << std::endl;
+//
+//	// loop through the image count
+//	for (size_t i = 0; i < hund; ++i)
+//	{
+//		// Individual image processing operations
+//
+//				// Formatted progress indicator
+//		percent = (100 * (i + 1)) / hund;
+//		if (percent >= displayNext)
+//		{
+//			std::cout << "\r";// << "[" << std::string(percent / 5, (char)254u) << std::string(100 / 5 - percent / 5, ' ') << "]";
+//			std::cout << percent << "%";// << " [Image " << i + 1 << " of " << hund << "]";
+//			//std::cout.flush();
+//			displayNext += step;
+//		}
+//	}
+//
+//}
 

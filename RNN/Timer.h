@@ -21,6 +21,24 @@ public:
 		return static_cast<Rep>(counted_time);
 	}
 
+	template<typename Unit = ns, typename Rep = double>
+	void print_time() const {
+		if (typeid(Unit) == typeid(s)) {
+			std::cout << " ~ " << elapsed_time<Unit>() << " seconds" << std::endl << std::endl;
+		} else if(typeid(Unit) == typeid(ms)) {
+			std::cout << " ~ " << elapsed_time<Unit>() << " milliseconds" << std::endl << std::endl;
+		}
+		else if (typeid(Unit) == typeid(mys)) {
+			std::cout << " ~ " << elapsed_time<Unit>() << " microseconds" << std::endl << std::endl;
+		}
+		else if (typeid(Unit) == typeid(ns)) {
+			std::cout << " ~ " << elapsed_time<Unit>() << " nanoseconds" << std::endl << std::endl;
+		}
+		else {
+			std::cout << "+++ ERROR: Could not represent unit +++" << std::endl;
+		}
+	}
+
 	void reset() {
 		m_start_point = Clock::now();
 	}

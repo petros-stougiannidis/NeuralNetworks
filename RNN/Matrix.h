@@ -69,11 +69,13 @@ public:
 	Matrix<T>& randomize_int(const int min, const int max);
 	Matrix<T>& randomize_double(double min, double max);
 	Matrix<T> hadamard(const Matrix<T>& m2);
+	len max_position() const;
 
 };
 //////////////////////////////////////////////////////////////////////////////////////////////
 //  KONSTRUKTOREN  ///////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////
+
 
 GENERIC Matrix<T>::Matrix(const len& rows, const len& columns)
 try : rows(rows), columns(columns) {
@@ -268,6 +270,17 @@ GENERIC Matrix<T> Matrix<T>::hadamard(const Matrix<T>& m2) {
 	catch (std::invalid_argument& error) {
 		std::cerr << error.what() << std::endl;
 	}
+}
+GENERIC len Matrix<T>::max_position() const { // REVISE
+	len current_max_position = 0;
+	double current_max_element = elements[0];
+	for (int i = 1; i < rows*columns; i++) {
+		if (elements[i] > current_max_element) {
+			current_max_position = i;
+			current_max_element = elements[i];
+		}
+	}
+	return current_max_position;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////

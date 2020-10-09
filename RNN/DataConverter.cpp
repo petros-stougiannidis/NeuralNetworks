@@ -1,4 +1,5 @@
 #include "DataConverter.h"
+#include "Timer.h"
 
 using String = std::string;
 DataConverter::DataConverter(const std::string& path, const len& dataset_size, const len& input_dimension, const len& output_dimension) 
@@ -7,6 +8,8 @@ DataConverter::DataConverter(const std::string& path, const len& dataset_size, c
 		input_dimension(input_dimension),
 		output_dimension(output_dimension){
 
+	std::cout << "reading " << path; 
+	Timer timer;
 	std::ifstream file;
 	file.open(path);
 	if (file.is_open()) {
@@ -32,6 +35,7 @@ DataConverter::DataConverter(const std::string& path, const len& dataset_size, c
 			data_points.clear();
 		}
 		file.close();
+		timer.print_time<s>();
 	}
 	else {
 		std::cout << "FAILED TO READ FILE";
