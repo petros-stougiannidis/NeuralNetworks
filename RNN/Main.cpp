@@ -69,27 +69,5 @@ int main(int argc, char** argv) {
 	std::cout << "successrate = " << (success * 100 / TESTSIZE) << "%" << std::endl;
 
 }
-//	int step = 1;
-//	int displayNext = step;
-//	int percent = 0;
-//	#define hund 1000000000
-//	std::cout << "Processing " << hund << " images..." << std::endl;
-//
-//	// loop through the image count
-//	for (size_t i = 0; i < hund; ++i)
-//	{
-//		// Individual image processing operations
-//
-//				// Formatted progress indicator
-//		percent = (100 * (i + 1)) / hund;
-//		if (percent >= displayNext)
-//		{
-//			std::cout << "\r";// << "[" << std::string(percent / 5, (char)254u) << std::string(100 / 5 - percent / 5, ' ') << "]";
-//			std::cout << percent << "%";// << " [Image " << i + 1 << " of " << hund << "]";
-//			//std::cout.flush();
-//			displayNext += step;
-//		}
-//	}
-//
-//}
+
 
