@@ -70,6 +70,7 @@ public:
 	Matrix<T>& randomize_double(double min, double max);
 	Matrix<T> hadamard(const Matrix<T>& m2);
 	len max_position() const;
+	Matrix<T> mul(const Matrix<T>& m2) const;
 
 };
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -440,8 +441,59 @@ GENERIC Matrix<T> Matrix<T>::operator*(const Matrix<T>& m2) const {
 	}
 	catch (std::invalid_argument& error) {
 		std::cerr << error.what() << std::endl;
+	} 
+}
+///////////////////////////////////////////////////////////////////////////
+// ALTERNATIVE
+GENERIC Matrix<T> Matrix<T>::mul(const Matrix<T>& m2) const {
+	try {
+		if (columns != m2.rows) throw std::invalid_argument("+++ ERROR: column dimension of Matrix A needs to match row dimension of Matrix B +++");
+		std::vector<T> result;
+		result.reserve(rows * m2.columns);
+		for (len i = 0; i < rows; i++) {
+			for (len j = 0; j < m2.columns; j++) {
+				T m3_value = 0;
+				T c0 = 0;
+				T c1 = 0;
+				T c2 = 0;
+				T c3 = 0;
+				T c4 = 0;
+				T c5 = 0;
+				T c6 = 0;
+				T c7 = 0;
+				T c8 = 0;
+				T c9 = 0;
+				int block_size = 10;
+				int blocks = columns / block_size; //2
+				int rest = columns % block_size; //0
+				for (len k = 0; k < blocks; k++) { //0-2
+					c0 = elements[i*columns + k*block_size + 0] * m2.elements[(k*block_size + 0) * m2.columns + j];
+					c1 = elements[i*columns + k*block_size + 1] * m2.elements[(k*block_size + 1) * m2.columns + j];
+					c2 = elements[i*columns + k*block_size + 2] * m2.elements[(k*block_size + 2) * m2.columns + j];
+					c3 = elements[i*columns + k*block_size + 3] * m2.elements[(k*block_size + 3) * m2.columns + j];
+					c4 = elements[i * columns + k * block_size + 4] * m2.elements[(k * block_size + 4) * m2.columns + j];
+					c5 = elements[i * columns + k * block_size + 5] * m2.elements[(k * block_size + 5) * m2.columns + j];
+					c6 = elements[i * columns + k * block_size + 6] * m2.elements[(k * block_size + 6) * m2.columns + j];
+					c7 = elements[i * columns + k * block_size + 7] * m2.elements[(k * block_size + 7) * m2.columns + j];
+					c8 = elements[i * columns + k * block_size + 8] * m2.elements[(k * block_size + 8) * m2.columns + j];
+					c9 = elements[i * columns + k * block_size + 9] * m2.elements[(k * block_size + 9) * m2.columns + j];
+
+					m3_value += c0 + c1 + c2 + c3 + c4 + c5 + c6 + c7 + c8 + c9;
+				}
+				for (len k = columns-rest; k < columns; k++) {
+					m3_value += elements[i * columns + k] * m2.elements[k * m2.columns + j];
+				}
+	
+				result.emplace_back(m3_value);
+			}
+		}
+		return Matrix<T>(rows, m2.columns, std::move(result));
+	}
+	catch (std::invalid_argument& error) {
+		std::cerr << error.what() << std::endl;
 	}
 }
+/////////////////////////////////////////////////////////////////////////////
 GENERIC Matrix<T>& Matrix<T>::operator*=(const Matrix<T>& m2) {
 	try {
 		if (columns != m2.rows) throw std::invalid_argument("+++ ERROR: column dimension of Matrix A needs to match row dimension of Matrix B +++");

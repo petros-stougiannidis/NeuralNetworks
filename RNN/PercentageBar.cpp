@@ -11,6 +11,7 @@ void PercentageBar::print_progress(const int& current_iteration, const int& tota
 		std::cout << "\r";
 		std::cout << "[" << std::string(percent / 2, (char)254u) << std::string(100 / 2 - percent / 2, ' ') << "] ";
 		std::cout << percent << "% ";
+		std::cout.flush();
 	}
 }
 

@@ -27,6 +27,9 @@
     <ClCompile Include="PercentageBar.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="testfile.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NeuralNetwork.h">

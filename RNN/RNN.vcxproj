@@ -143,6 +143,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="NeuralNetwork.cpp" />
     <ClCompile Include="PercentageBar.cpp" />
+    <ClCompile Include="testfile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DataConverter.h" />
