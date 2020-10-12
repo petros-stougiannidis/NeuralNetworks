@@ -57,7 +57,7 @@ Matrix<double>& apply_softsign_derivative(Matrix<double>& matrix) {
 Matrix<double> NeuralNetwork::feed_forward(const Matrix<double>& input) const {
     Matrix<double> output = input;
     for (len i = 0; i < weights.size(); i++) {
-        output = (weights[i] * output) + biases[i];
+        output = (weights[i] * output);// +biases[i];
         output.map(ACTIVATION);
     }
     return  output;
@@ -70,7 +70,7 @@ void NeuralNetwork::train(const Matrix<double>& input, const Matrix<double>& tra
     outputs[0] = input;          
 
     for (len i = 0; i < outputs.size()-1; i++) {        
-        outputs[i + 1] = (weights[i] * outputs[i]) + biases[i];
+        outputs[i + 1] = (weights[i] * outputs[i]);// +biases[i];
         outputs[i + 1].map(ACTIVATION);
     }
 
@@ -83,7 +83,7 @@ void NeuralNetwork::train(const Matrix<double>& input, const Matrix<double>& tra
     for (len i = weights.size() - 1; i >= 0; i--) {
         Matrix<double> delta_biases = errors[i].hadamard(ACTIVATION_DERIVATIVE(outputs[i + 1]));
         Matrix<double> delta_weights = delta_biases * outputs[i].transpose();
-        biases[i] += delta_biases * learningrate;
+        //biases[i] += delta_biases * learningrate;
         weights[i] += delta_weights * learningrate;
     } 
 }
