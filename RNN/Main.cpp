@@ -47,7 +47,7 @@ int count_matches_in_batch(const std::vector<len>& a, const std::vector<len>& b)
 
 int main(int argc, char** argv) {	
 
-
+	// TEST TEST TEST
 	DataConverter data_train(PATH_TRAIN, TRAINSIZE, INPUTSIZE, OUTPUTSIZE);
 	DataConverter data_test(PATH_TEST, TESTSIZE, INPUTSIZE, OUTPUTSIZE);
 
