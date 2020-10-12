@@ -63,8 +63,7 @@ public:
 	Matrix<T>& map(T function(const T&));
 	Matrix<T>& iota();
 	Matrix<T>& iota(const T& start);
-	Matrix<T>& randomize_int(const int min, const int max);
-	Matrix<T>& randomize_double(double min, double max);
+	Matrix<T>& randomize(const T& min, const T& max);
 	Matrix<T> hadamard(const Matrix<T>& m2);
 	std::vector<int> evaluate_batch() const;
 	Matrix<T> mul(const Matrix<T>& m2) const;
@@ -235,27 +234,37 @@ GENERIC Matrix<T>& Matrix<T>::iota(const T& start) {
 	}
 	return *this;
 }
-GENERIC Matrix<T>& Matrix<T>::randomize_int(const int min, const int max) {
+GENERIC Matrix<T>& Matrix<T>::randomize(const T& min, const T& max) {
 	std::random_device rd;
 	std::mt19937 seed(rd());
-	std::uniform_int_distribution<int> dist(min, max);
-	for (int i = 0; i < rows * columns; i++) {
-		elements[i] = (T)dist(seed);
-	}
-	return *this;
-}
-GENERIC Matrix<T>& Matrix<T>::randomize_double(double min, double max) {
-	std::random_device rd;
-	std::mt19937 seed(rd());
-	std::uniform_real_distribution<double> dist(min, max);
-	for (int i = 0; i < rows * columns; i++) {
-		elements[i] = (T)dist(seed);
-		while (elements[i] == 0) {
+	if(typeid(T) == typeid(float)){
+		std::uniform_real_distribution<float> dist(min, max);
+		for (int i = 0; i < rows * columns; i++) {
 			elements[i] = (T)dist(seed);
-			std::cout << "Matrix Element wurde zufaellig auf 0 gesetzt!" << std::endl; // TODO: Profen
+			while (elements[i] == 0) {
+				elements[i] = (T)dist(seed);
+			}
 		}
+		return *this;
 	}
-	return *this;
+	else if (typeid(T) == typeid(double)) {
+		std::uniform_real_distribution<double> dist(min, max);
+		for (int i = 0; i < rows * columns; i++) {
+			elements[i] = (T)dist(seed);
+			while (elements[i] == 0) {
+				elements[i] = (T)dist(seed);
+			}
+		}
+		return *this;
+	}
+	else if (typeid(T) == typeid(int)) {
+		std::uniform_int_distribution<int> dist(min, max);
+		for (int i = 0; i < rows * columns; i++) {
+			elements[i] = (T)dist(seed);
+		}
+		return *this;
+	}
+	
 }
 GENERIC Matrix<T> Matrix<T>::hadamard(const Matrix<T>& m2) {
 	try {
@@ -274,7 +283,7 @@ GENERIC Matrix<T> Matrix<T>::hadamard(const Matrix<T>& m2) {
 GENERIC std::vector<int> Matrix<T>::evaluate_batch() const { // REVISE
 	if (columns == 1) {
 		int current_max_position = 0;
-		double current_max_element = elements[0];
+		float current_max_element = elements[0];
 		for (int i = 1; i < rows * columns; i++) {
 			if (elements[i] > current_max_element) {
 				current_max_position = i;
@@ -290,7 +299,7 @@ GENERIC std::vector<int> Matrix<T>::evaluate_batch() const { // REVISE
 		result.reserve(columns);
 		for (int j = 0; j < columns; j++) {
 			int current_max_position = 0;
-			double current_max_element = elements[0 * columns + j];
+			float current_max_element = elements[0 * columns + j];
 			for (int i = 1; i < rows; i++) {
 				if (elements[i * columns + j] > current_max_element) {
 					current_max_position = i;

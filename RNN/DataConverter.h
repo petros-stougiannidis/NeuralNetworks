@@ -16,16 +16,16 @@ private:
 	const int& input_dimension;
 	const int& output_dimension;
 	const int& batch_size;
-	std::vector<Matrix<double>> labels;
-	std::vector<Matrix<double>> values;
+	std::vector<Matrix<float>> labels;
+	std::vector<Matrix<float>> values;
 
 
 public:
 
 	DataConverter(const std::string& path, const int& dataset_size, const int& input_dimension, const int& output_dimension);
 	DataConverter(const std::string& path, const int& dataset_size, const int& input_dimension, const int& output_dimension, const int& batch_size);
-	const std::vector<Matrix<double>>& data_set;
-	const std::vector<Matrix<double>>& label_set;
+	const std::vector<Matrix<float>>& data_set;
+	const std::vector<Matrix<float>>& label_set;
 
 
 };

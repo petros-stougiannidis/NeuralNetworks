@@ -5,16 +5,16 @@
 class NeuralNetwork {
 public:
 //Konstruktoren
-    NeuralNetwork(const double& learningrate, const std::vector<int>& topology, const int& batch_size);
+    NeuralNetwork(const float& learningrate, const std::vector<int>& topology, const int& batch_size);
 //Funktionen
-    Matrix<double> feed_forward(const Matrix<double>& input) const;
-    void train(const Matrix<double>& input, const Matrix<double>& training_data);
+    Matrix<float> feed_forward(const Matrix<float>& input) const;
+    void train(const Matrix<float>& input, const Matrix<float>& training_data);
 
 private:
-    double learningrate;
+    float learningrate;
     std::vector<int> topology;
-    std::vector<Matrix<double>> weights;
-    std::vector<Matrix<double>> biases;
+    std::vector<Matrix<float>> weights;
+    std::vector<Matrix<float>> biases;
 
 };
 

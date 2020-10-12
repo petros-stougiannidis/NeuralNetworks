@@ -10,7 +10,7 @@
 #define BATCHSIZE 10 // preferably divisor of data_set_size 
 #define INPUTSIZE 784
 #define OUTPUTSIZE 10
-#define TOPOLOGY {784,10,10}
+#define TOPOLOGY {784,20,10}
 #define LEARNINGRATE 0.1
 #define PATH_TRAIN "mnist_train.csv"
 #define PATH_TEST "mnist_test.csv"
@@ -68,10 +68,10 @@ int main(int argc, char** argv) {
 	log("testing progress");
 	timer.reset();
 
-	double success = 0;
+	float success = 0;
 	int test_iteration = 0;
 	for (int i = 0; i < TESTSIZE / BATCHSIZE; i++) {
-		Matrix<double> output = n1.feed_forward(test.data_set[i]);
+		Matrix<float> output = n1.feed_forward(test.data_set[i]);
 		success += count_matches_in_batch(
 						output.evaluate_batch(),
 						test.label_set[i].evaluate_batch());

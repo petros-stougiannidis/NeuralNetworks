@@ -28,7 +28,7 @@ DataConverter::DataConverter(const std::string& path, const int& dataset_size, c
 		String current_line;
 		String current_data_point;
 
-		std::vector<double> data_points;
+		std::vector<float> data_points;
 		data_points.reserve(input_dimension);
 		
 		while (std::getline(file, current_line, '\n')) { 
@@ -81,7 +81,7 @@ DataConverter::DataConverter(const std::string& path, const int& dataset_size, c
 		String current_line;
 		String current_data_point;
 		
-		std::vector<double> data_points;
+		std::vector<float> data_points;
 		data_points.reserve(input_dimension);
 
 		while (std::getline(file, current_line, '\n')) {
@@ -100,9 +100,9 @@ DataConverter::DataConverter(const std::string& path, const int& dataset_size, c
 		}
 
 		//////// BATCH
-		Matrix<double> e;
-		std::vector<Matrix<double>> batched_values;
-		std::vector<Matrix<double>> batched_labels;
+		Matrix<float> e;
+		std::vector<Matrix<float>> batched_values;
+		std::vector<Matrix<float>> batched_labels;
 		batched_values.reserve(dataset_size / batch_size);
 		batched_labels.reserve(dataset_size / batch_size);
 
