@@ -7,7 +7,11 @@ DataConverter::DataConverter(const std::string& path, const len& dataset_size, c
 	:	path(path), 
 		dataset_size(dataset_size),
 		input_dimension(input_dimension),
-		output_dimension(output_dimension){
+		output_dimension(output_dimension),
+		labels(), 
+		values(),
+		data_set(values),
+		label_set(labels){
 
 	std::cout << "reading " << path << std::endl;
 	Timer timer;
@@ -42,6 +46,8 @@ DataConverter::DataConverter(const std::string& path, const len& dataset_size, c
 		}
 		file.close();
 		timer.print_time<s>();
+
+	
 	}
 	else {
 		std::cout << "FAILED TO READ FILE";
@@ -53,7 +59,11 @@ DataConverter::DataConverter(const std::string& path, const len& dataset_size, c
 	: path(path),
 	dataset_size(dataset_size),
 	input_dimension(input_dimension),
-	output_dimension(output_dimension) {
+	output_dimension(output_dimension),
+	labels(),
+	values(),
+	data_set(values),
+	label_set(labels) {
 
 	std::cout << "reading " << path << std::endl;
 	Timer timer;
@@ -109,12 +119,5 @@ DataConverter::DataConverter(const std::string& path, const len& dataset_size, c
 		std::cout << "FAILED TO READ FILE";
 		exit(100);
 	}
-}
-
-const std::vector<Matrix<double>>& DataConverter::get_labels() const {
-	return labels;
-}
-const std::vector<Matrix<double>>& DataConverter::get_values() const {
-	return values;
 }
 

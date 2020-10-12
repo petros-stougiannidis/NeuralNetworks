@@ -18,12 +18,14 @@ private:
 	std::vector<Matrix<double>> labels;
 	std::vector<Matrix<double>> values;
 
+
 public:
 
 	DataConverter(const std::string& path, const len& dataset_size, const len& input_dimension, const len& output_dimension);
 	DataConverter(const std::string& path, const len& dataset_size, const len& input_dimension, const len& output_dimension, const len& batch_size);
-	const std::vector<Matrix<double>>& get_labels() const;
-	const std::vector<Matrix<double>>& get_values() const;
+	const std::vector<Matrix<double>>& data_set;
+	const std::vector<Matrix<double>>& label_set;
+
 
 };
 
