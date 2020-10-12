@@ -1,5 +1,6 @@
 #include "DataConverter.h"
 #include "Timer.h"
+#include "PercentageBar.h"
 
 using String = std::string;
 DataConverter::DataConverter(const std::string& path, const len& dataset_size, const len& input_dimension, const len& output_dimension) 
@@ -8,11 +9,14 @@ DataConverter::DataConverter(const std::string& path, const len& dataset_size, c
 		input_dimension(input_dimension),
 		output_dimension(output_dimension){
 
-	std::cout << "reading " << path; 
+	std::cout << "reading " << path << std::endl;
 	Timer timer;
 	std::ifstream file;
 	file.open(path);
 	if (file.is_open()) {
+
+		int iteration = 0;
+		PercentageBar percentage_bar;
 		labels.reserve(dataset_size);
 		values.reserve(dataset_size);
 
@@ -33,6 +37,8 @@ DataConverter::DataConverter(const std::string& path, const len& dataset_size, c
 			}
 			this->values.emplace_back(input_dimension, 1, std::move(data_points));
 			data_points.clear();
+			percentage_bar.print_progress(iteration, dataset_size);
+			iteration++;
 		}
 		file.close();
 		timer.print_time<s>();
@@ -49,17 +55,20 @@ DataConverter::DataConverter(const std::string& path, const len& dataset_size, c
 	input_dimension(input_dimension),
 	output_dimension(output_dimension) {
 
-	std::cout << "reading " << path;
+	std::cout << "reading " << path << std::endl;
 	Timer timer;
 	std::ifstream file;
 	file.open(path);
 	if (file.is_open()) {
+		int iteration = 0;
+		PercentageBar percentage_bar;
+
 		labels.reserve(dataset_size);
 		values.reserve(dataset_size);
 
 		String current_line;
 		String current_data_point;
-
+		
 		std::vector<double> data_points;
 		data_points.reserve(input_dimension);
 
@@ -74,6 +83,8 @@ DataConverter::DataConverter(const std::string& path, const len& dataset_size, c
 			}
 			this->values.emplace_back(input_dimension, 1, std::move(data_points));
 			data_points.clear();
+			percentage_bar.print_progress(iteration, dataset_size);
+			iteration++;
 		}
 
 		//////// BATCH

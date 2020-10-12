@@ -6,11 +6,11 @@
 
 #define TRAINSIZE 60000
 #define TESTSIZE 10000
-#define EPOCHS 3
+#define EPOCHS 1
 #define BATCHSIZE 10
 #define INPUTSIZE 784
 #define OUTPUTSIZE 10
-#define TOPOLOGY {784,100,10}
+#define TOPOLOGY {784,10,10}
 #define LEARNINGRATE 0.5
 #define PATH_TRAIN "mnist_train.csv"
 #define PATH_TEST "mnist_test.csv"
@@ -88,8 +88,8 @@ int main(int argc, char** argv) {
 	}
 	timer.print_time<ms>();
 	std::cout << "successrate = " << (success * 100 / TESTSIZE) << "%" << std::endl;
-	n1.feed_forward(test_data_set[0]).print();
-	test_labels[0].print();
+	//n1.feed_forward(test_data_set[0]).print();
+	//test_labels[0].print();
 }
 
 
