@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <iostream>
 #include <vector>
 #include <random>
@@ -8,7 +8,7 @@
 using len = int;
 
 GENERIC class Matrix {
-	static_assert(std::is_arithmetic_v<T>, "+++ ERROR: matrix must contain arithmetic datatype +++\n\n"); //Matrixklasse für arithmetische Datentypen (int, float, double etc.)
+	static_assert(std::is_arithmetic_v<T>, "+++ ERROR: matrix must contain arithmetic datatype +++\n\n"); //Matrixklasse fï¿½r arithmetische Datentypen (int, float, double etc.)
 	//static int move_count = 0;
 	//static int copy_count = 0;
 private:
@@ -69,8 +69,10 @@ public:
 	Matrix<T>& randomize_int(const int min, const int max);
 	Matrix<T>& randomize_double(double min, double max);
 	Matrix<T> hadamard(const Matrix<T>& m2);
-	len max_position() const;
+	std::vector<len> evaluate_batch() const;
 	Matrix<T> mul(const Matrix<T>& m2) const;
+	Matrix<T> column_concat(const Matrix& m2) const;
+	Matrix<T> column_concat(const std::vector<Matrix<T>>& batch, len batch_size, len start) const;
 
 };
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -117,13 +119,13 @@ catch (std::invalid_argument& error) {
 	std::cerr << error.what() << std::endl;
 }
 
-GENERIC Matrix<T>::Matrix(const Matrix<T>& to_be_copied) 
-	: rows(to_be_copied.rows), columns(to_be_copied.columns), elements(std::vector<T>(to_be_copied.elements)){
+GENERIC Matrix<T>::Matrix(const Matrix<T>& to_be_copied)
+	: rows(to_be_copied.rows), columns(to_be_copied.columns), elements(std::vector<T>(to_be_copied.elements)) {
 	//std::cout << "copy constructor!" << std::endl;
 	//copy_count++;
 }
 GENERIC Matrix<T>::Matrix(Matrix<T>&& to_be_moved)
-	: rows(std::move(to_be_moved.rows)), columns(std::move(to_be_moved.columns)), elements(std::move(to_be_moved.elements)){
+	: rows(std::move(to_be_moved.rows)), columns(std::move(to_be_moved.columns)), elements(std::move(to_be_moved.elements)) {
 	//std::cout << "move constructor!" << std::endl;
 	//move_count++;
 }
@@ -253,7 +255,7 @@ GENERIC Matrix<T>& Matrix<T>::randomize_double(double min, double max) {
 		elements[i] = (T)dist(seed);
 		while (elements[i] == 0) {
 			elements[i] = (T)dist(seed);
-			std::cout << "Matrix Element wurde zufällig auf 0 gesetzt!" << std::endl; // TODO: Profen
+			std::cout << "Matrix Element wurde zufï¿½llig auf 0 gesetzt!" << std::endl; // TODO: Profen
 		}
 	}
 	return *this;
@@ -272,16 +274,81 @@ GENERIC Matrix<T> Matrix<T>::hadamard(const Matrix<T>& m2) {
 		std::cerr << error.what() << std::endl;
 	}
 }
-GENERIC len Matrix<T>::max_position() const { // REVISE
-	len current_max_position = 0;
-	double current_max_element = elements[0];
-	for (int i = 1; i < rows*columns; i++) {
-		if (elements[i] > current_max_element) {
-			current_max_position = i;
-			current_max_element = elements[i];
+GENERIC std::vector<len> Matrix<T>::evaluate_batch() const { // REVISE
+	if (columns == 1) {
+		len current_max_position = 0;
+		double current_max_element = elements[0];
+		for (int i = 1; i < rows * columns; i++) {
+			if (elements[i] > current_max_element) {
+				current_max_position = i;
+				current_max_element = elements[i];
+			}
 		}
+		std::vector<len> result;
+		result.push_back(current_max_position);
+		return result;
 	}
-	return current_max_position;
+	else {
+		std::vector<len> result;
+		result.reserve(columns);
+		for (int j = 0; j < columns; j++) {
+			len current_max_position = 0;
+			double current_max_element = elements[0 * columns + j];
+			for (int i = 1; i < rows; i++) {
+				if (elements[i * columns + j] > current_max_element) {
+					current_max_position = i;
+					current_max_element = elements[i * columns + j];
+				}
+			}
+			result.push_back(current_max_position);
+		}
+		return result;
+	}
+
+}
+GENERIC Matrix<T> Matrix<T>::column_concat(const Matrix& m2) const {
+	try {
+		if (rows != m2.rows) throw std::invalid_argument("row number doesnt match");
+
+		std::vector<T> result;
+		result.reserve(rows * columns + m2.columns);
+		for (len i = 0; i < rows; i++) {
+			for (len j = 0; j < columns; j++) {
+				result.emplace_back(this->elements[i * columns + j]);
+			}
+			for (len j = 0; j < m2.columns; j++) {
+				result.emplace_back(m2(i, j));
+			}
+		}
+		return Matrix<T>(rows, columns + m2.columns, std::move(result));
+	}
+	catch (std::invalid_argument& error) {
+		std::cerr << error.what();
+	}
+}
+
+GENERIC Matrix<T> Matrix<T>::column_concat(const std::vector<Matrix<T>>& batch, len batch_size, len start) const { // make static
+	try {
+		len rows_of_first = batch[start].get_rows();
+		len all_columns = 0;
+		for (len i = 0; i < batch_size; i++) {
+			all_columns += batch[start + i].get_columns();
+			if (batch[start + i].get_rows() != rows_of_first) throw std::invalid_argument("+++ ERROR: row numbers need to match for all Matrices +++");
+		}
+		std::vector<T> result;
+		result.reserve(rows_of_first * all_columns);
+		for (len i = 0; i < rows_of_first; i++) {
+			for (len j = 0; j < batch_size; j++) {
+				for (len k = 0; k < batch[start + j].get_columns(); k++) {
+					result.emplace_back(batch[start + j](i, k));
+				}
+			}
+		}
+		return Matrix<T>(rows_of_first, all_columns, std::move(result));
+	}
+	catch (std::invalid_argument& error) {
+		std::cerr << error.what() << std::endl;
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -441,7 +508,7 @@ GENERIC Matrix<T> Matrix<T>::operator*(const Matrix<T>& m2) const {
 	}
 	catch (std::invalid_argument& error) {
 		std::cerr << error.what() << std::endl;
-	} 
+	}
 }
 ///////////////////////////////////////////////////////////////////////////
 // ALTERNATIVE
@@ -467,10 +534,10 @@ GENERIC Matrix<T> Matrix<T>::mul(const Matrix<T>& m2) const {
 				int blocks = columns / block_size; //2
 				int rest = columns % block_size; //0
 				for (len k = 0; k < blocks; k++) { //0-2
-					c0 = elements[i*columns + k*block_size + 0] * m2.elements[(k*block_size + 0) * m2.columns + j];
-					c1 = elements[i*columns + k*block_size + 1] * m2.elements[(k*block_size + 1) * m2.columns + j];
-					c2 = elements[i*columns + k*block_size + 2] * m2.elements[(k*block_size + 2) * m2.columns + j];
-					c3 = elements[i*columns + k*block_size + 3] * m2.elements[(k*block_size + 3) * m2.columns + j];
+					c0 = elements[i * columns + k * block_size + 0] * m2.elements[(k * block_size + 0) * m2.columns + j];
+					c1 = elements[i * columns + k * block_size + 1] * m2.elements[(k * block_size + 1) * m2.columns + j];
+					c2 = elements[i * columns + k * block_size + 2] * m2.elements[(k * block_size + 2) * m2.columns + j];
+					c3 = elements[i * columns + k * block_size + 3] * m2.elements[(k * block_size + 3) * m2.columns + j];
 					c4 = elements[i * columns + k * block_size + 4] * m2.elements[(k * block_size + 4) * m2.columns + j];
 					c5 = elements[i * columns + k * block_size + 5] * m2.elements[(k * block_size + 5) * m2.columns + j];
 					c6 = elements[i * columns + k * block_size + 6] * m2.elements[(k * block_size + 6) * m2.columns + j];
@@ -480,10 +547,10 @@ GENERIC Matrix<T> Matrix<T>::mul(const Matrix<T>& m2) const {
 
 					m3_value += c0 + c1 + c2 + c3 + c4 + c5 + c6 + c7 + c8 + c9;
 				}
-				for (len k = columns-rest; k < columns; k++) {
+				for (len k = columns - rest; k < columns; k++) {
 					m3_value += elements[i * columns + k] * m2.elements[k * m2.columns + j];
 				}
-	
+
 				result.emplace_back(m3_value);
 			}
 		}

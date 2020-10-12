@@ -6,11 +6,12 @@
 
 #define TRAINSIZE 60000
 #define TESTSIZE 10000
-#define EPOCHS 3
+#define EPOCHS 1
+
 #define INPUTSIZE 784
 #define OUTPUTSIZE 10
-#define TOPOLOGY {784,100,10}
-#define LEARNINGRATE 0.1
+#define TOPOLOGY {784,5,10}
+#define LEARNINGRATE 0.5
 #define PATH_TRAIN "mnist_train.csv"
 #define PATH_TEST "mnist_test.csv"
 
@@ -34,6 +35,14 @@
 
 void log(const std::string& msg) {
 	std::cout << msg << std::endl;
+}
+
+int count_matches_in_batch(const std::vector<len>& a, const std::vector<len>& b) {
+	int success = 0;
+	for (int i = 0; i < a.size(); i++) {
+		if (a[i] == b[i]) success++;
+	}
+	return success;
 }
 
 int main(int argc, char** argv) {	
@@ -63,14 +72,15 @@ int main(int argc, char** argv) {
 
 	log("testing progress");
 	timer.reset();
-
+	Matrix<double> e;
 	double success = 0;
 	int test_iteration = 0;
 	for (int i = 0; i < TESTSIZE; i++) {
-		Matrix<double> erg = n1.feed_forward(test_data_set[i]);
-		if (erg.max_position() == test_labels[i].max_position()) {
-			success++;
-		}
+		Matrix<double> output = n1.feed_forward(test_data_set[i]);
+		success += count_matches_in_batch(
+						output.evaluate_batch(),
+						test_labels[i].evaluate_batch());
+
 		percentage_bar.print_progress(test_iteration, TESTSIZE);
 		test_iteration++;
 
