@@ -22,8 +22,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{791b7e29-96a9-4d76-b1e6-2e3831c3d4d2}</ProjectGuid>
-    <RootNamespace>RecurrentNeuralNetwork</RootNamespace>
+    <ProjectGuid>{51952232-9d2c-437c-8379-a7ed052d4017}</ProjectGuid>
+    <RootNamespace>Convolutional</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
