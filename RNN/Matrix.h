@@ -255,7 +255,7 @@ GENERIC Matrix<T>& Matrix<T>::randomize_double(double min, double max) {
 		elements[i] = (T)dist(seed);
 		while (elements[i] == 0) {
 			elements[i] = (T)dist(seed);
-			std::cout << "Matrix Element wurde zuf�llig auf 0 gesetzt!" << std::endl; // TODO: Profen
+			std::cout << "Matrix Element wurde zufaellig auf 0 gesetzt!" << std::endl; // TODO: Profen
 		}
 	}
 	return *this;

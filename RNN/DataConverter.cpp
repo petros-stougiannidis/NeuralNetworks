@@ -45,7 +45,7 @@ DataConverter::DataConverter(const std::string& path, const len& dataset_size, c
 	}
 	else {
 		std::cout << "FAILED TO READ FILE";
-		exit(0);
+		exit(100);
 	}
 }
 
@@ -107,7 +107,7 @@ DataConverter::DataConverter(const std::string& path, const len& dataset_size, c
 	}
 	else {
 		std::cout << "FAILED TO READ FILE";
-		exit(0);
+		exit(100);
 	}
 }
 

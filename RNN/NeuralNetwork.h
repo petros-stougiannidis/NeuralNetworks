@@ -5,7 +5,7 @@ using len = int;
 class NeuralNetwork {
 public:
 //Konstruktoren
-    NeuralNetwork(const double& learningrate, const std::vector<len>& topology);
+    NeuralNetwork(const double& learningrate, const std::vector<len>& topology, const len& batch_size);
 //Funktionen
     Matrix<double> feed_forward(const Matrix<double>& input) const;
     void train(const Matrix<double>& input, const Matrix<double>& training_data);

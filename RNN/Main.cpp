@@ -7,22 +7,22 @@
 #define TRAINSIZE 60000
 #define TESTSIZE 10000
 #define EPOCHS 1
-#define BATCHSIZE 10
+#define BATCHSIZE 10 // preferably divisor of data_set_size 
 #define INPUTSIZE 784
 #define OUTPUTSIZE 10
-#define TOPOLOGY {784,10,10}
-#define LEARNINGRATE 0.5
+#define TOPOLOGY {784,100,10}
+#define LEARNINGRATE 0.1
 #define PATH_TRAIN "mnist_train.csv"
 #define PATH_TEST "mnist_test.csv"
 
 //#define TRAINSIZE 100
 //#define TESTSIZE 10
-//#define EPOCHS 1
-//#define BATCHSIZE 1
+//#define EPOCHS 3
+//#define BATCHSIZE 10
 //#define INPUTSIZE 784
 //#define OUTPUTSIZE 10
-//#define TOPOLOGY {784,5,10}
-//#define LEARNINGRATE 0.5
+//#define TOPOLOGY {784,200,10}
+//#define LEARNINGRATE 0.3
 //#define PATH_TRAIN "mnist_train_100.csv"
 //#define PATH_TEST "mnist_test_10.csv"
 
@@ -31,7 +31,6 @@
 #define training_labels data_train.get_labels()
 #define test_data_set data_test.get_values()
 #define test_labels data_test.get_labels()
-
 
 
 void log(const std::string& msg) {
@@ -47,12 +46,11 @@ int count_matches_in_batch(const std::vector<len>& a, const std::vector<len>& b)
 }
 
 int main(int argc, char** argv) {	
-
-	// TEST TEST TEST
+	
 	DataConverter data_train(PATH_TRAIN, TRAINSIZE, INPUTSIZE, OUTPUTSIZE, BATCHSIZE);
 	DataConverter data_test(PATH_TEST, TESTSIZE, INPUTSIZE, OUTPUTSIZE, BATCHSIZE);
 
-	NeuralNetwork n1(LEARNINGRATE, TOPOLOGY);
+	NeuralNetwork n1(LEARNINGRATE, TOPOLOGY, BATCHSIZE);
 
 	Timer timer;
 	PercentageBar percentage_bar;
