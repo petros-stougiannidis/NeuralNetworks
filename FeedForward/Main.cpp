@@ -10,7 +10,7 @@
 #define BATCHSIZE 10 // preferably divisor of data_set_size 
 #define INPUTSIZE 784
 #define OUTPUTSIZE 10
-#define TOPOLOGY {784,900,10}
+#define TOPOLOGY {784,10,10}
 #define LEARNINGRATE 0.2
 #define ACTIVATION "relu"
 #define PATH_TRAIN "mnist_train.csv"

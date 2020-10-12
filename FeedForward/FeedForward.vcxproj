@@ -22,7 +22,7 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{4764c146-6e21-406f-8429-c9a5da6599fe}</ProjectGuid>
-    <RootNamespace>RNN</RootNamespace>
+    <RootNamespace>FeedForward</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectName>FeedForward</ProjectName>
   </PropertyGroup>
