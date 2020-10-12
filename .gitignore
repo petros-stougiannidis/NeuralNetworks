@@ -344,3 +344,5 @@ healthchecksdb
 /RNN/mnist_train_100.csv
 /RNN/text.txt
 /RNN/testfile.cpp
+*.csv
+*.cpp
