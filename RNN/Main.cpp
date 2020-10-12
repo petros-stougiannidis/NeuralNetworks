@@ -2,7 +2,7 @@
 #include "Matrix.h"
 #include "Timer.h"
 #include "PercentageBar.h"
-#include "DataConverter.h "   // normal mul == 100 s, blocksize 4 = 110
+#include "DataConverter.h"  
 
 #define TRAINSIZE 60000
 #define TESTSIZE 10000
@@ -10,19 +10,21 @@
 #define BATCHSIZE 10 // preferably divisor of data_set_size 
 #define INPUTSIZE 784
 #define OUTPUTSIZE 10
-#define TOPOLOGY {784,20,10}
-#define LEARNINGRATE 0.1
+#define TOPOLOGY {784,900,10}
+#define LEARNINGRATE 0.2
+#define ACTIVATION "relu"
 #define PATH_TRAIN "mnist_train.csv"
 #define PATH_TEST "mnist_test.csv"
 
 //#define TRAINSIZE 100
 //#define TESTSIZE 10
 //#define EPOCHS 3
-//#define BATCHSIZE 10 // preferably divisor of data_set_size 
+//#define BATCHSIZE 1 // preferably divisor of data_set_size 
 //#define INPUTSIZE 784
 //#define OUTPUTSIZE 10
-//#define TOPOLOGY {784,200,10}
-//#define LEARNINGRATE 0.3
+//#define TOPOLOGY {784,20,10}
+//#define LEARNINGRATE 0.5
+//#define ACTIVATION "sigmoid"
 //#define PATH_TRAIN "mnist_train_100.csv"
 //#define PATH_TEST "mnist_test_10.csv"
 
@@ -44,7 +46,7 @@ int main(int argc, char** argv) {
 	DataConverter test(PATH_TEST, TESTSIZE, INPUTSIZE, OUTPUTSIZE, BATCHSIZE);
 
 	//initialze neural network
-	NeuralNetwork n1(LEARNINGRATE, TOPOLOGY, BATCHSIZE);
+	NeuralNetwork n1(LEARNINGRATE, ACTIVATION, TOPOLOGY, BATCHSIZE);
 		
 	Timer timer;
 	PercentageBar percentage_bar;
@@ -80,7 +82,7 @@ int main(int argc, char** argv) {
 		test_iteration++;
 
 	}
-	timer.print_time<ms>();
+	timer.print_time<s>();
 	std::cout << "successrate = " << (success * 100 / TESTSIZE) << "%" << std::endl;
 
 }
