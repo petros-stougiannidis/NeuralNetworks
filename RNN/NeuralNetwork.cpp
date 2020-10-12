@@ -6,7 +6,7 @@
 
 //TODO: simoid-He-Initialisation; tanh-Xavier-Initialisation
 
-NeuralNetwork::NeuralNetwork(const double& learningrate, const std::vector<len>& topology, const len& batch_size)
+NeuralNetwork::NeuralNetwork(const double& learningrate, const std::vector<int>& topology, const int& batch_size)
     try :   learningrate(learningrate),
             topology(topology),
             weights(std::vector<Matrix<double>>(topology.size() - 1)),
@@ -14,7 +14,7 @@ NeuralNetwork::NeuralNetwork(const double& learningrate, const std::vector<len>&
 
             if (topology.size() < 2) throw std::invalid_argument("Es werden mindestens ein Eingangs- und eine Ausgangsschicht benoetigt");
 
-            for (const len& val : topology) if (val <= 0) throw std::invalid_argument("Es wird mindestens ein Knoten pro Schicht benoetigt");
+            for (const int& val : topology) if (val <= 0) throw std::invalid_argument("Es wird mindestens ein Knoten pro Schicht benoetigt");
 
             for (int i = 0; i < weights.size(); i++) {
                 weights[i] = Matrix<double>(topology[i + 1], topology[i], 0);
@@ -56,7 +56,7 @@ Matrix<double>& apply_softsign_derivative(Matrix<double>& matrix) {
 }
 Matrix<double> NeuralNetwork::feed_forward(const Matrix<double>& input) const {
     Matrix<double> output = input;
-    for (len i = 0; i < weights.size(); i++) {
+    for (int i = 0; i < weights.size(); i++) {
         output = (weights[i] * output) +biases[i];
         output.map(ACTIVATION);
     }
@@ -69,30 +69,22 @@ void NeuralNetwork::train(const Matrix<double>& input, const Matrix<double>& tra
 
     outputs[0] = input;          
 
-    for (len i = 0; i < outputs.size()-1; i++) {        
+    for (int i = 0; i < outputs.size()-1; i++) {        
         outputs[i + 1] = (weights[i] * outputs[i]) +biases[i];
         outputs[i + 1].map(ACTIVATION);
     }
 
     errors[errors.size() - 1] = training_data - outputs[outputs.size()-1]; 
     
-    for (len i = errors.size()-2; i >= 0; i--) {
+    for (int i = errors.size()-2; i >= 0; i--) {
         errors[i] = weights[i + 1].transpose() * errors[i + 1]; //TODO:: .* activation'(z(i+1)) ????
     }
         
-    for (len i = weights.size() - 1; i >= 0; i--) {
+    for (int i = weights.size() - 1; i >= 0; i--) {
         Matrix<double> delta_biases = errors[i].hadamard(ACTIVATION_DERIVATIVE(outputs[i + 1]));
         Matrix<double> delta_weights = delta_biases * outputs[i].transpose();
         biases[i] += delta_biases * learningrate;
         weights[i] += delta_weights * learningrate;
     } 
 }
-std::vector<Matrix<double>> NeuralNetwork::get_weights() const {
-    return weights;
-}
-std::vector<len> NeuralNetwork::get_dimensions() const {
-    return topology;
-}
-std::vector<Matrix<double>> NeuralNetwork::get_biases() const {
-    return biases;
-}
+

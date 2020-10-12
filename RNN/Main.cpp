@@ -18,7 +18,7 @@
 //#define TRAINSIZE 100
 //#define TESTSIZE 10
 //#define EPOCHS 3
-//#define BATCHSIZE 10
+//#define BATCHSIZE 10 // preferably divisor of data_set_size 
 //#define INPUTSIZE 784
 //#define OUTPUTSIZE 10
 //#define TOPOLOGY {784,200,10}
@@ -26,15 +26,10 @@
 //#define PATH_TRAIN "mnist_train_100.csv"
 //#define PATH_TEST "mnist_test_10.csv"
 
-
-
-
-
 void log(const std::string& msg) {
 	std::cout << msg << std::endl;
 }
-
-int count_matches_in_batch(const std::vector<len>& a, const std::vector<len>& b) {
+int count_matches_in_batch(const std::vector<int>& a, const std::vector<int>& b) {
 	int success = 0;
 	for (int i = 0; i < a.size(); i++) {
 		if (a[i] == b[i]) success++;
@@ -43,25 +38,28 @@ int count_matches_in_batch(const std::vector<len>& a, const std::vector<len>& b)
 }
 
 int main(int argc, char** argv) {	
-	
+
+	//read and parse datasets
 	DataConverter training(PATH_TRAIN, TRAINSIZE, INPUTSIZE, OUTPUTSIZE, BATCHSIZE);
 	DataConverter test(PATH_TEST, TESTSIZE, INPUTSIZE, OUTPUTSIZE, BATCHSIZE);
 
+	//initialze neural network
 	NeuralNetwork n1(LEARNINGRATE, TOPOLOGY, BATCHSIZE);
-
-
+		
 	Timer timer;
 	PercentageBar percentage_bar;
 
 	log("training progress"); 
 	timer.reset();
 
-	int training_iterations = 0;
+	int training_iteration = 0;
 	for (int epochs = 0; epochs < EPOCHS; epochs++) {
 		for (int i = 0; i < TRAINSIZE / BATCHSIZE; i++) {
+
 			n1.train(training.data_set[i], training.label_set[i]);
-			percentage_bar.print_progress(training_iterations, (TRAINSIZE * EPOCHS) / BATCHSIZE);
-			training_iterations++;
+
+			percentage_bar.print_progress(training_iteration, (TRAINSIZE * EPOCHS) / BATCHSIZE);
+			training_iteration++;
 		}
 	}
 	timer.print_time<s>();
@@ -69,7 +67,7 @@ int main(int argc, char** argv) {
 
 	log("testing progress");
 	timer.reset();
-	Matrix<double> e;
+
 	double success = 0;
 	int test_iteration = 0;
 	for (int i = 0; i < TESTSIZE / BATCHSIZE; i++) {

@@ -3,11 +3,12 @@
 #include "PercentageBar.h"
 
 using String = std::string;
-DataConverter::DataConverter(const std::string& path, const len& dataset_size, const len& input_dimension, const len& output_dimension) 
+DataConverter::DataConverter(const std::string& path, const int& dataset_size, const int& input_dimension, const int& output_dimension) 
 	:	path(path), 
 		dataset_size(dataset_size),
 		input_dimension(input_dimension),
 		output_dimension(output_dimension),
+		batch_size(batch_size),
 		labels(), 
 		values(),
 		data_set(values),
@@ -55,11 +56,12 @@ DataConverter::DataConverter(const std::string& path, const len& dataset_size, c
 	}
 }
 
-DataConverter::DataConverter(const std::string& path, const len& dataset_size, const len& input_dimension, const len& output_dimension, const len& batch_size)
+DataConverter::DataConverter(const std::string& path, const int& dataset_size, const int& input_dimension, const int& output_dimension, const int& batch_size)
 	: path(path),
 	dataset_size(dataset_size),
 	input_dimension(input_dimension),
 	output_dimension(output_dimension),
+	batch_size(batch_size),
 	labels(),
 	values(),
 	data_set(values),
@@ -104,7 +106,7 @@ DataConverter::DataConverter(const std::string& path, const len& dataset_size, c
 		batched_values.reserve(dataset_size / batch_size);
 		batched_labels.reserve(dataset_size / batch_size);
 
-		for (len i = 0; i < dataset_size / batch_size; i++) {
+		for (int i = 0; i < dataset_size / batch_size; i++) {
 			batched_values.emplace_back(e.column_concat(this->values, batch_size, i * batch_size));
 			batched_labels.emplace_back(e.column_concat(this->labels, batch_size, i * batch_size));
 		}
