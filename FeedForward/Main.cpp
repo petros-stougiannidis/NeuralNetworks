@@ -3,16 +3,16 @@
 #include "Timer.h"
 #include "PercentageBar.h"
 #include "DataConverter.h"  
-
+//
 #define TRAINSIZE 60000
 #define TESTSIZE 10000
-#define EPOCHS 1
+#define EPOCHS 20
 #define BATCHSIZE 10 // preferably divisor of data_set_size 
 #define INPUTSIZE 784
 #define OUTPUTSIZE 10
-#define TOPOLOGY {784,10,10}
-#define LEARNINGRATE 0.2
-#define ACTIVATION "relu"
+#define TOPOLOGY {784,20,10}
+#define LEARNINGRATE 0.1
+#define ACTIVATION {"relu", "sigmoid"}
 #define PATH_TRAIN "mnist_train.csv"
 #define PATH_TEST "mnist_test.csv"
 
@@ -24,7 +24,7 @@
 //#define OUTPUTSIZE 10
 //#define TOPOLOGY {784,20,10}
 //#define LEARNINGRATE 0.5
-//#define ACTIVATION "sigmoid"
+//#define ACTIVATION {"relu", "relu"}
 //#define PATH_TRAIN "mnist_train_100.csv"
 //#define PATH_TEST "mnist_test_10.csv"
 
@@ -40,6 +40,7 @@ int count_matches_in_batch(const std::vector<int>& a, const std::vector<int>& b)
 }
 
 int main(int argc, char** argv) {	
+
 
 	//read and parse datasets
 	DataConverter training(PATH_TRAIN, TRAINSIZE, INPUTSIZE, OUTPUTSIZE, BATCHSIZE);
@@ -75,16 +76,18 @@ int main(int argc, char** argv) {
 	for (int i = 0; i < TESTSIZE / BATCHSIZE; i++) {
 		Matrix<float> output = n1.feed_forward(test.data_set[i]);
 		success += count_matches_in_batch(
-						output.evaluate_batch(),
-						test.label_set[i].evaluate_batch());
+						output.argmax_batch(),
+						test.label_set[i].argmax_batch());
 
 		percentage_bar.print_progress(test_iteration, TESTSIZE / BATCHSIZE);
 		test_iteration++;
 
+		
+
 	}
 	timer.print_time<s>();
 	std::cout << "successrate = " << (success * 100 / TESTSIZE) << "%" << std::endl;
-
+	n1.feed_forward(test.data_set[0]).print();
 }
 
 

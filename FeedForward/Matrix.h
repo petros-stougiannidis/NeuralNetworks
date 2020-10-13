@@ -65,7 +65,7 @@ public:
 	Matrix<T>& iota(const T& start);
 	Matrix<T>& randomize(const T& min, const T& max);
 	Matrix<T> hadamard(const Matrix<T>& m2);
-	std::vector<int> evaluate_batch() const;
+	std::vector<int> argmax_batch() const;
 	Matrix<T> mul(const Matrix<T>& m2) const;
 	Matrix<T> column_concat(const Matrix& m2) const;
 	Matrix<T> column_concat(const std::vector<Matrix<T>>& batch, const int& batch_size, const int& start) const;
@@ -280,7 +280,7 @@ GENERIC Matrix<T> Matrix<T>::hadamard(const Matrix<T>& m2) {
 		std::cerr << error.what() << std::endl;
 	}
 }
-GENERIC std::vector<int> Matrix<T>::evaluate_batch() const { // REVISE
+GENERIC std::vector<int> Matrix<T>::argmax_batch() const { // REVISE
 	if (columns == 1) {
 		int current_max_position = 0;
 		float current_max_element = elements[0];
