@@ -13,6 +13,7 @@ public:
 private:
     float learningrate;
     std::vector<int> topology;
+    int batch_size;
     std::vector<std::string> activation_functions;
     std::vector<Matrix<float>> weights;
     std::vector<Matrix<float>> biases;

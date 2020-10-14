@@ -5,6 +5,7 @@ NeuralNetwork::NeuralNetwork(const float& learningrate, const std::vector<std::s
     try :   learningrate(learningrate),
             activation_functions(activation_functions),
             topology(topology),
+            batch_size(batch_size),
             weights(std::vector<Matrix<float>>(topology.size() - 1)),
             biases(std::vector<Matrix<float>>(weights.size())) {
 
@@ -24,7 +25,7 @@ NeuralNetwork::NeuralNetwork(const float& learningrate, const std::vector<std::s
             if (activation_functions.size() != weights.size()) {
                 std::cout << std::endl;
                 std::cout << "The number of activations functions doesnt match the number of layers. Initializing with sigmoid (default)." << std::endl << std::endl;
-                this->activation_functions = std::vector<std::string>(weights.size() - 1, std::string("sigmoid"));
+                this->activation_functions = std::vector<std::string>(weights.size(), std::string("sigmoid"));
             }
 
 
@@ -36,17 +37,27 @@ NeuralNetwork::NeuralNetwork(const float& learningrate, const std::vector<std::s
 float sigmoid(const float& x) {
     return 1 / (1 + exp(-x));
 }
+Matrix<float>& apply_sigmoid(Matrix<float>& matrix) {
+    return matrix.map([](const float& x) {return sigmoid(x); });
+}
 Matrix<float>& apply_sigmoid_derivative(Matrix<float>& matrix) { 
     return matrix.map([](const float& x) {return sigmoid(x) * (1 - sigmoid(x)); });
 }
 float ReLU(const float& x) {
     return (0 <= x) ? x : 0;
 }
+Matrix<float>& apply_ReLU(Matrix<float>& matrix) {
+    return matrix.map([](const float& x) {return ReLU(x); });
+}
 Matrix<float>& apply_ReLU_derivative(Matrix<float>& matrix) {
     return matrix.map([](const float& x) -> float {return (0 <= x) ? 1 : 0; });
+
 }
 float m_tanh(const float& x) {
     return tanh(x);
+}
+Matrix<float>& apply_tanh(Matrix<float>& matrix) {
+    return matrix.map([](const float& x) {return tanh(x); });
 }
 Matrix<float>& apply_tanh_derivative(Matrix<float>& matrix) {
     return matrix.map([](const float& x) -> float {return 1 - pow(tanh(x), 2); });
@@ -54,30 +65,70 @@ Matrix<float>& apply_tanh_derivative(Matrix<float>& matrix) {
 float softsign(const float& x) {
     return x / (1 + abs(x));
 }
+Matrix<float>& apply_softsign(Matrix<float>& matrix) {
+    return matrix.map([](const float& x) {return softsign(x); });
+}
 Matrix<float>& apply_softsign_derivative(Matrix<float>& matrix) {
     return matrix.map([](const float& x) -> float {return 1 / pow((1 + abs(x)), 2); });
 }
-//float softmax(const float& x) { // TODO
-//    return 
+
+//Matrix<float>& apply_softmax(Matrix<float>& matrix) { // TODO
+//    float denominator;
+//    std::vector<int> position_of_biggest_per_column = matrix.argmax_batch();
+//
+//    for (int j = 0; j < matrix.get_columns(); j++) {
+//        float val = matrix(position_of_biggest_per_column[j], j);
+//        for (int i = 0; i < matrix.get_rows(); i++) {
+//
+//            matrix(i, j, matrix(i, j) - val);
+//        }
+//    }
+//
+//    matrix.map([](const float& x) {return exp(x); });
+//    for (int j = 0; j < matrix.get_columns(); j++) {
+//        float acc = 0;
+//        for (int i = 0; i < matrix.get_rows(); i++) {
+//            acc += matrix(i, j);
+//        }
+//        denominator = acc;
+//        for (int i = 0; i < matrix.get_rows(); i++) {
+//            matrix(i, j, matrix.get_value(i, j) / denominator);
+//        }
+//    }
+//    return matrix;
+//}
+//Matrix<float>& apply_softmax_derivative(Matrix<float>& matrix) { // TODO
+//    matrix.map([](const float& x) {return exp(x); });
+//    for (int j = 0; j < matrix.get_columns(); j++) {
+//        for (int i = 0; i < matrix.get_rows(); i++) {
+//            if (i == 0) {
+//                float denominator = 0;
+//                for (int k = 0; k < matrix.get_rows(); k++) {
+//                    denominator += matrix()
+//                }
+//            }
+//        }
+//   }
 //}
 Matrix<float> NeuralNetwork::feed_forward(const Matrix<float>& input) const {
 
     Matrix<float> output = input;
     for (int i = 0; i < weights.size(); i++) {
 
-        auto activation = sigmoid;
+        auto activation = apply_sigmoid;
         if (activation_functions[i] == "relu") {
-            auto activation = ReLU;
+            activation = apply_ReLU;
+        } else if (activation_functions[i] == "tanh") {
+            activation = apply_tanh;
+        } else if (activation_functions[i] == "softsign") {
+            activation = apply_softsign;
+        } else if (activation_functions[i] == "sigmoid") {
+            activation = apply_sigmoid;
         }
-        else if (activation_functions[i] == "tanh") {
-            auto activation = m_tanh;
-        }
-        else if (activation_functions[i] == "softsign") {
-            auto activation = softsign;
-        }
+     
 
         output = (weights[i] * output) + biases[i];
-        output.map(activation);
+        activation(output);
     }
     return  output;
 }
@@ -92,20 +143,20 @@ void NeuralNetwork::train(const Matrix<float>& input, const Matrix<float>& train
     for (int i = 0; i < outputs.size()-1; i++) {    
 
 
-        auto activation = sigmoid;
+        auto activation = apply_sigmoid;
         if (activation_functions[i] == "relu") {
-            auto activation = ReLU;
-        }
-        else if (activation_functions[i] == "tanh") {
-            auto activation = m_tanh;
-        }
-        else if (activation_functions[i] == "softsign") {
-            auto activation = softsign;
+            activation = apply_ReLU;
+        } else if (activation_functions[i] == "tanh") {
+            activation = apply_tanh;
+        } else if (activation_functions[i] == "softsign") {
+            activation = apply_softsign;
+        } else if (activation_functions[i] == "sigmoid") {
+            activation = apply_sigmoid;
         }
 
         outputs[i + 1] = (weights[i] * outputs[i]) + biases[i];
         weighted_sum[i] = outputs[i + 1];
-        outputs[i + 1].map(activation);
+        activation(outputs[i + 1]);
     }
 
     errors.back() = training_data - outputs.back(); 
@@ -118,25 +169,20 @@ void NeuralNetwork::train(const Matrix<float>& input, const Matrix<float>& train
 
         auto activation_derivative = apply_sigmoid_derivative;
         if (activation_functions[i] == "relu") {
-            auto activation_derivative = apply_ReLU_derivative;
-            //std::cout << "using relu" << std::endl;
+            activation_derivative = apply_ReLU_derivative;
+        } else if (activation_functions[i] == "tanh") {
+            activation_derivative = apply_tanh_derivative;
+        } else if (activation_functions[i] == "softsign") {
+            activation_derivative = apply_softsign_derivative;
+        } else if (activation_functions[i] == "sigmoid") {
+            activation_derivative = apply_sigmoid_derivative;
         }
-        else if (activation_functions[i] == "tanh") {
-            auto activation_derivative = apply_tanh_derivative;
-            //std::cout << "using tanh" << std::endl;
-        }
-        else if (activation_functions[i] == "softsign") {
-            auto activation_derivative = apply_softsign_derivative;
-            //std::cout << "using soft" << std::endl;
-        }
-        else {
-            //std::cout << "using sigmoid" << std::endl;
-        }
+  
 
         Matrix<float> delta_biases = errors[i].hadamard(activation_derivative(weighted_sum[i]));
         Matrix<float> delta_weights = delta_biases * outputs[i].transpose();
-        biases[i] += delta_biases * learningrate;
-        weights[i] += delta_weights * learningrate;
+        biases[i] += delta_biases * (learningrate / batch_size); ///introduce as param x/i+0.0001
+        weights[i] += delta_weights * (learningrate / batch_size);
     } 
 }
 

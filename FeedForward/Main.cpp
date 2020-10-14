@@ -6,25 +6,25 @@
 //
 #define TRAINSIZE 60000
 #define TESTSIZE 10000
-#define EPOCHS 20
+#define EPOCHS 1
 #define BATCHSIZE 10 // preferably divisor of data_set_size 
 #define INPUTSIZE 784
 #define OUTPUTSIZE 10
-#define TOPOLOGY {784,20,10}
+#define TOPOLOGY {784,785,10}
 #define LEARNINGRATE 0.1
-#define ACTIVATION {"relu", "sigmoid"}
+#define ACTIVATION {"relu", "relu", "relu", "sigmoid", "sigmoid"}
 #define PATH_TRAIN "mnist_train.csv"
 #define PATH_TEST "mnist_test.csv"
 
 //#define TRAINSIZE 100
 //#define TESTSIZE 10
-//#define EPOCHS 3
-//#define BATCHSIZE 1 // preferably divisor of data_set_size 
+//#define EPOCHS 100
+//#define BATCHSIZE 10 // preferably divisor of data_set_size 
 //#define INPUTSIZE 784
 //#define OUTPUTSIZE 10
-//#define TOPOLOGY {784,20,10}
+//#define TOPOLOGY {784,200,10}
 //#define LEARNINGRATE 0.5
-//#define ACTIVATION {"relu", "relu"}
+//#define ACTIVATION {"sigmoid", "sigmoid"}
 //#define PATH_TRAIN "mnist_train_100.csv"
 //#define PATH_TEST "mnist_test_10.csv"
 
@@ -39,9 +39,9 @@ int count_matches_in_batch(const std::vector<int>& a, const std::vector<int>& b)
 	return success;
 }
 
+
 int main(int argc, char** argv) {	
-
-
+	
 	//read and parse datasets
 	DataConverter training(PATH_TRAIN, TRAINSIZE, INPUTSIZE, OUTPUTSIZE, BATCHSIZE);
 	DataConverter test(PATH_TEST, TESTSIZE, INPUTSIZE, OUTPUTSIZE, BATCHSIZE);
@@ -87,7 +87,7 @@ int main(int argc, char** argv) {
 	}
 	timer.print_time<s>();
 	std::cout << "successrate = " << (success * 100 / TESTSIZE) << "%" << std::endl;
-	n1.feed_forward(test.data_set[0]).print();
+
 }
 
 
