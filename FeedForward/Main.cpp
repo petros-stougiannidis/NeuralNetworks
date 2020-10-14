@@ -7,12 +7,12 @@
 #define TRAINSIZE 60000
 #define TESTSIZE 10000
 #define EPOCHS 1
-#define BATCHSIZE 10 // preferably divisor of data_set_size 
+#define BATCHSIZE 1 // preferably divisor of data_set_size 
 #define INPUTSIZE 784
 #define OUTPUTSIZE 10
-#define TOPOLOGY {784,785,10}
+#define TOPOLOGY {784,10,10}
 #define LEARNINGRATE 0.1
-#define ACTIVATION {"relu", "relu", "relu", "sigmoid", "sigmoid"}
+#define ACTIVATION {"relu", "softmax"}
 #define PATH_TRAIN "mnist_train.csv"
 #define PATH_TEST "mnist_test.csv"
 
@@ -87,6 +87,7 @@ int main(int argc, char** argv) {
 	}
 	timer.print_time<s>();
 	std::cout << "successrate = " << (success * 100 / TESTSIZE) << "%" << std::endl;
+	std::cout << "\a";
 
 }
 

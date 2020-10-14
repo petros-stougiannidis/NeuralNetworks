@@ -71,45 +71,48 @@ Matrix<float>& apply_softsign(Matrix<float>& matrix) {
 Matrix<float>& apply_softsign_derivative(Matrix<float>& matrix) {
     return matrix.map([](const float& x) -> float {return 1 / pow((1 + abs(x)), 2); });
 }
-
-//Matrix<float>& apply_softmax(Matrix<float>& matrix) { // TODO
-//    float denominator;
-//    std::vector<int> position_of_biggest_per_column = matrix.argmax_batch();
-//
-//    for (int j = 0; j < matrix.get_columns(); j++) {
-//        float val = matrix(position_of_biggest_per_column[j], j);
-//        for (int i = 0; i < matrix.get_rows(); i++) {
-//
-//            matrix(i, j, matrix(i, j) - val);
-//        }
-//    }
-//
-//    matrix.map([](const float& x) {return exp(x); });
-//    for (int j = 0; j < matrix.get_columns(); j++) {
-//        float acc = 0;
-//        for (int i = 0; i < matrix.get_rows(); i++) {
-//            acc += matrix(i, j);
-//        }
-//        denominator = acc;
-//        for (int i = 0; i < matrix.get_rows(); i++) {
-//            matrix(i, j, matrix.get_value(i, j) / denominator);
-//        }
-//    }
-//    return matrix;
-//}
-//Matrix<float>& apply_softmax_derivative(Matrix<float>& matrix) { // TODO
-//    matrix.map([](const float& x) {return exp(x); });
-//    for (int j = 0; j < matrix.get_columns(); j++) {
-//        for (int i = 0; i < matrix.get_rows(); i++) {
-//            if (i == 0) {
-//                float denominator = 0;
-//                for (int k = 0; k < matrix.get_rows(); k++) {
-//                    denominator += matrix()
-//                }
+//Matrix<float>& apply_softsign_derivative(Matrix<float>& matrix) {
+//    apply_softmax(matrix);
+//    Matrix<float> result = matrix;
+//    {
+//        for (int j = 0; j < result.get_columns(); j++) {
+//            for (int i = 0; i < result.get_rows(); i++) {
+//                result(i,j)
 //            }
 //        }
-//   }
+//    }
 //}
+
+Matrix<float>& apply_softmax(Matrix<float>& matrix) { // TODO
+    float denominator;
+    std::vector<int> position_of_biggest_per_column = matrix.argmax_batch();
+
+    for (int j = 0; j < matrix.get_columns(); j++) {
+        float val = matrix(position_of_biggest_per_column[j], j);
+        for (int i = 0; i < matrix.get_rows(); i++) {
+
+            matrix(i, j, matrix(i, j) - val);
+        }
+    }
+
+    matrix.map([](const float& x) {return exp(x); });
+    for (int j = 0; j < matrix.get_columns(); j++) {
+        float acc = 0;
+        for (int i = 0; i < matrix.get_rows(); i++) {
+            acc += matrix(i, j);
+        }
+        denominator = acc;
+        for (int i = 0; i < matrix.get_rows(); i++) {
+            matrix(i, j, matrix.get_value(i, j) / denominator);
+        }
+    }
+    return matrix;
+}
+Matrix<float>& apply_softmax_derivative(Matrix<float>& matrix) { // TODO MAKE RIGHT
+    apply_softmax(matrix);
+    matrix = matrix.hadamard(Matrix<float>(matrix.get_rows(), matrix.get_columns(), 1) - matrix);
+    return matrix;
+}
 Matrix<float> NeuralNetwork::feed_forward(const Matrix<float>& input) const {
 
     Matrix<float> output = input;
@@ -124,6 +127,9 @@ Matrix<float> NeuralNetwork::feed_forward(const Matrix<float>& input) const {
             activation = apply_softsign;
         } else if (activation_functions[i] == "sigmoid") {
             activation = apply_sigmoid;
+        }
+        else if (activation_functions[i] == "softmax") {
+            activation = apply_softmax;
         }
      
 
@@ -152,6 +158,8 @@ void NeuralNetwork::train(const Matrix<float>& input, const Matrix<float>& train
             activation = apply_softsign;
         } else if (activation_functions[i] == "sigmoid") {
             activation = apply_sigmoid;
+        } else if (activation_functions[i] == "softmax") {
+            activation = apply_softmax;
         }
 
         outputs[i + 1] = (weights[i] * outputs[i]) + biases[i];
@@ -176,6 +184,8 @@ void NeuralNetwork::train(const Matrix<float>& input, const Matrix<float>& train
             activation_derivative = apply_softsign_derivative;
         } else if (activation_functions[i] == "sigmoid") {
             activation_derivative = apply_sigmoid_derivative;
+        } else if (activation_functions[i] == "softmax") {
+            activation_derivative = apply_softmax_derivative; // ADD DERIVATIVE
         }
   
 
