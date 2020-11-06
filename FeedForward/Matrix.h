@@ -6,7 +6,7 @@
 #define GENERIC template<typename T>
 
 GENERIC class Matrix {
-	static_assert(std::is_arithmetic_v<T>, "+++ ERROR: matrix must contain arithmetic datatype +++\n\n"); //Matrixklasse f�r arithmetische Datentypen (int, float, double etc.)
+	static_assert(std::is_arithmetic_v<T>, "+++ ERROR: matrix must contain arithmetic datatype +++\n\n"); //matrix class for arithmetic datatypes (int, float, double etc.)
 
 private:
 	int rows;
@@ -14,7 +14,7 @@ private:
 	std::vector<T> elements;
 
 public:
-	//Konstruktoren & Destruktor
+	//Constructors & Destructor
 	Matrix<T>() = default;
 	Matrix<T>(const int& rows, const int& columns); //construct Matrix and fill with 0
 	Matrix<T>(const int& rows, const int& columns, const T& value); //construct Matrix and fill with start value
@@ -36,7 +36,7 @@ public:
 	T get_value(const int& row, const int& column) const;
 	Matrix<T>& set_value(const int& row, const int& column, const T& value);
 
-	//Operatoren
+	//Operators
 	bool operator==(const Matrix<T>& m2) const;
 	T operator()(const size_t& row, const size_t& column) const;
 	Matrix<T>& operator()(const size_t& row, const size_t& column, const T& value);
@@ -56,7 +56,7 @@ public:
 	Matrix<T> operator/(const T& scalar) const;
 	Matrix<T>& operator/=(const T& scalar);
 
-	//Funktionen
+	//Functions
 	void print() const;
 	Matrix<T> transpose() const;
 	Matrix<T> unit_matrix(const int& dimension) const;
@@ -72,7 +72,7 @@ public:
 	
 };
 //////////////////////////////////////////////////////////////////////////////////////////////
-//  KONSTRUKTOREN  ///////////////////////////////////////////////////////////////////////////
+//  CONSTRUCTORS   ///////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -80,7 +80,6 @@ GENERIC Matrix<T>::Matrix(const int& rows, const int& columns)
 try : rows(rows), columns(columns) {
 	if (rows < 1 || columns < 1) throw std::invalid_argument("+++ ERROR: invalid dimensions +++");
 	this->elements = std::move(std::vector<T>(rows * columns));
-	//std::cout << "constructor 1!" << std::endl;
 }
 catch (std::invalid_argument& error) {
 	std::cerr << error.what() << std::endl;
@@ -89,7 +88,6 @@ GENERIC Matrix<T>::Matrix(const int& rows, const int& columns, const T& value)
 try : rows(rows), columns(columns) {
 	if (rows < 1 || columns < 1) throw std::invalid_argument("+++ ERROR: invalid dimensions +++");
 	this->elements = std::move(std::vector<T>(rows * columns, value));
-	//std::cout << "constructor2!" << std::endl;
 }
 catch (std::invalid_argument& error) {
 	std::cerr << error.what() << std::endl;
@@ -99,7 +97,6 @@ try : rows(rows), columns(columns) {
 	if (rows < 1 || columns < 1) throw std::invalid_argument("+++ ERROR: invalid dimensions +++");
 	if (rows * columns != vector.size()) throw std::invalid_argument("+++ ERROR: dimensions dont match vector length +++");
 	this->elements = vector;
-	//std::cout << "copied vector into matrix!" << std::endl;
 }
 catch (std::invalid_argument& error) {
 	std::cerr << error.what() << std::endl;
@@ -109,7 +106,6 @@ try : rows(rows), columns(columns) {
 	if (rows < 1 || columns < 1) throw std::invalid_argument("+++ ERROR: invalid dimensions +++");
 	if (rows * columns != to_be_moved.size()) throw std::invalid_argument("+++ ERROR: dimensions dont match vector length +++");
 	this->elements = std::move(to_be_moved);
-	//std::cout << "moved vector into matrix!" << std::endl;
 }
 catch (std::invalid_argument& error) {
 	std::cerr << error.what() << std::endl;
@@ -117,28 +113,20 @@ catch (std::invalid_argument& error) {
 
 GENERIC Matrix<T>::Matrix(const Matrix<T>& to_be_copied)
 	: rows(to_be_copied.rows), columns(to_be_copied.columns), elements(std::vector<T>(to_be_copied.elements)) {
-	//std::cout << "copy constructor!" << std::endl;
-	//copy_count++;
 }
 GENERIC Matrix<T>::Matrix(Matrix<T>&& to_be_moved)
 	: rows(std::move(to_be_moved.rows)), columns(std::move(to_be_moved.columns)), elements(std::move(to_be_moved.elements)) {
-	//std::cout << "move constructor!" << std::endl;
-	//move_count++;
 }
 GENERIC Matrix<T>& Matrix<T>::operator=(const Matrix<T>& m2) {
 	rows = m2.rows;
 	columns = m2.columns;
 	elements = m2.elements;
-	//std::cout << "copy assignment!" << std::endl;
-	//copy_count++;
 	return *this;
 }
 GENERIC Matrix<T>& Matrix<T>::operator=(Matrix<T>&& m2) {
 	rows = std::move(m2.rows);
 	columns = std::move(m2.columns);
 	elements = std::move(m2.elements);
-	//std::cout << "move assignment!" << std::endl;
-	//move_count++;
 	return *this;
 }
 
@@ -172,7 +160,7 @@ GENERIC Matrix<T>& Matrix<T>::set_value(const int& row, const int& column, const
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
-//  FUNKTIONEN  //////////////////////////////////////////////////////////////////////////////
+//  FUNCTIONS   //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////
 
 GENERIC void Matrix<T>::print() const {
@@ -214,7 +202,7 @@ GENERIC Matrix<T> Matrix<T>::unit_matrix(const int& dimension) const {
 	}
 	return Matrix<T>(dimension, dimension, std::move(result));
 }
-GENERIC Matrix<T>& Matrix<T>::map(T function(const T&)) {  // :: a -> a // BROKEN
+GENERIC Matrix<T>& Matrix<T>::map(T function(const T&)) { 
 	for (int i = 0; i < rows * columns; i++) {
 		elements[i] = function(elements[i]);
 	}
@@ -280,7 +268,7 @@ GENERIC Matrix<T> Matrix<T>::hadamard(const Matrix<T>& m2) {
 		std::cerr << error.what() << std::endl;
 	}
 }
-GENERIC std::vector<int> Matrix<T>::argmax_batch() const { // REVISE
+GENERIC std::vector<int> Matrix<T>::argmax_batch() const { // PROTOTYPE
 	if (columns == 1) {
 		int current_max_position = 0;
 		float current_max_element = elements[0];
@@ -358,7 +346,7 @@ GENERIC Matrix<T> Matrix<T>::column_concat(const std::vector<Matrix<T>>& batch, 
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
-//  OPERATOREN  //////////////////////////////////////////////////////////////////////////////
+//  OPERATORS   //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////
 
 GENERIC bool Matrix<T>::operator==(const Matrix<T>& m2) const {
@@ -516,57 +504,6 @@ GENERIC Matrix<T> Matrix<T>::operator*(const Matrix<T>& m2) const {
 		std::cerr << error.what() << std::endl;
 	}
 }
-///////////////////////////////////////////////////////////////////////////
-// ALTERNATIVE
-GENERIC Matrix<T> Matrix<T>::mul(const Matrix<T>& m2) const {
-	try {
-		if (columns != m2.rows) throw std::invalid_argument("+++ ERROR: column dimension of Matrix A needs to match row dimension of Matrix B +++");
-		std::vector<T> result;
-		result.reserve(rows * m2.columns);
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < m2.columns; j++) {
-				T m3_value = 0;
-				T c0 = 0;
-				T c1 = 0;
-				T c2 = 0;
-				T c3 = 0;
-				T c4 = 0;
-				T c5 = 0;
-				T c6 = 0;
-				T c7 = 0;
-				T c8 = 0;
-				T c9 = 0;
-				int block_size = 10;
-				int blocks = columns / block_size; //2
-				int rest = columns % block_size; //0
-				for (int k = 0; k < blocks; k++) { //0-2
-					c0 = elements[i * columns + k * block_size + 0] * m2.elements[(k * block_size + 0) * m2.columns + j];
-					c1 = elements[i * columns + k * block_size + 1] * m2.elements[(k * block_size + 1) * m2.columns + j];
-					c2 = elements[i * columns + k * block_size + 2] * m2.elements[(k * block_size + 2) * m2.columns + j];
-					c3 = elements[i * columns + k * block_size + 3] * m2.elements[(k * block_size + 3) * m2.columns + j];
-					c4 = elements[i * columns + k * block_size + 4] * m2.elements[(k * block_size + 4) * m2.columns + j];
-					c5 = elements[i * columns + k * block_size + 5] * m2.elements[(k * block_size + 5) * m2.columns + j];
-					c6 = elements[i * columns + k * block_size + 6] * m2.elements[(k * block_size + 6) * m2.columns + j];
-					c7 = elements[i * columns + k * block_size + 7] * m2.elements[(k * block_size + 7) * m2.columns + j];
-					c8 = elements[i * columns + k * block_size + 8] * m2.elements[(k * block_size + 8) * m2.columns + j];
-					c9 = elements[i * columns + k * block_size + 9] * m2.elements[(k * block_size + 9) * m2.columns + j];
-
-					m3_value += c0 + c1 + c2 + c3 + c4 + c5 + c6 + c7 + c8 + c9;
-				}
-				for (int k = columns - rest; k < columns; k++) {
-					m3_value += elements[i * columns + k] * m2.elements[k * m2.columns + j];
-				}
-
-				result.emplace_back(m3_value);
-			}
-		}
-		return Matrix<T>(rows, m2.columns, std::move(result));
-	}
-	catch (std::invalid_argument& error) {
-		std::cerr << error.what() << std::endl;
-	}
-}
-/////////////////////////////////////////////////////////////////////////////
 GENERIC Matrix<T>& Matrix<T>::operator*=(const Matrix<T>& m2) {
 	try {
 		if (columns != m2.rows) throw std::invalid_argument("+++ ERROR: column dimension of Matrix A needs to match row dimension of Matrix B +++");

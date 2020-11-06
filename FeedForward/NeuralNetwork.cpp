@@ -71,19 +71,8 @@ Matrix<float>& apply_softsign(Matrix<float>& matrix) {
 Matrix<float>& apply_softsign_derivative(Matrix<float>& matrix) {
     return matrix.map([](const float& x) -> float {return 1 / pow((1 + abs(x)), 2); });
 }
-//Matrix<float>& apply_softsign_derivative(Matrix<float>& matrix) {
-//    apply_softmax(matrix);
-//    Matrix<float> result = matrix;
-//    {
-//        for (int j = 0; j < result.get_columns(); j++) {
-//            for (int i = 0; i < result.get_rows(); i++) {
-//                result(i,j)
-//            }
-//        }
-//    }
-//}
-
-Matrix<float>& apply_softmax(Matrix<float>& matrix) { // TODO
+// Applies the softmax function to a batch of column vectors
+Matrix<float>& apply_softmax(Matrix<float>& matrix) { // 
     float denominator;
     std::vector<int> position_of_biggest_per_column = matrix.argmax_batch();
 
@@ -108,11 +97,13 @@ Matrix<float>& apply_softmax(Matrix<float>& matrix) { // TODO
     }
     return matrix;
 }
-Matrix<float>& apply_softmax_derivative(Matrix<float>& matrix) { // TODO MAKE RIGHT
+// This is still a wrong implementation
+Matrix<float>& apply_softmax_derivative(Matrix<float>& matrix) { 
     apply_softmax(matrix);
     matrix = matrix.hadamard(Matrix<float>(matrix.get_rows(), matrix.get_columns(), 1) - matrix);
     return matrix;
 }
+
 Matrix<float> NeuralNetwork::feed_forward(const Matrix<float>& input) const {
 
     Matrix<float> output = input;
@@ -170,7 +161,7 @@ void NeuralNetwork::train(const Matrix<float>& input, const Matrix<float>& train
     errors.back() = training_data - outputs.back(); 
     
     for (int i = errors.size()-2; i >= 0; i--) {
-        errors[i] = weights[i + 1].transpose() * errors[i + 1]; //TODO:: .* activation'(z(i+1)) ????
+        errors[i] = weights[i + 1].transpose() * errors[i + 1]; 
     }
        
     for (int i = weights.size() - 1; i >= 0; i--) {
@@ -185,13 +176,13 @@ void NeuralNetwork::train(const Matrix<float>& input, const Matrix<float>& train
         } else if (activation_functions[i] == "sigmoid") {
             activation_derivative = apply_sigmoid_derivative;
         } else if (activation_functions[i] == "softmax") {
-            activation_derivative = apply_softmax_derivative; // ADD DERIVATIVE
+            activation_derivative = apply_softmax_derivative; 
         }
   
 
         Matrix<float> delta_biases = errors[i].hadamard(activation_derivative(weighted_sum[i]));
         Matrix<float> delta_weights = delta_biases * outputs[i].transpose();
-        biases[i] += delta_biases * (learningrate / batch_size); ///introduce as param x/i+0.0001
+        biases[i] += delta_biases * (learningrate / batch_size); 
         weights[i] += delta_weights * (learningrate / batch_size);
     } 
 }

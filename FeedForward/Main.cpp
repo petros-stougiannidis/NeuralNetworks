@@ -3,16 +3,16 @@
 #include "Timer.h"
 #include "PercentageBar.h"
 #include "DataConverter.h"  
-//
+
 #define TRAINSIZE 60000
 #define TESTSIZE 10000
-#define EPOCHS 1
-#define BATCHSIZE 1 // preferably divisor of data_set_size 
+#define EPOCHS 3
+#define BATCHSIZE 10 // preferably divisor of data_set_size 
 #define INPUTSIZE 784
 #define OUTPUTSIZE 10
-#define TOPOLOGY {784,10,10}
+#define TOPOLOGY {784,20,10}
 #define LEARNINGRATE 0.1
-#define ACTIVATION {"relu", "softmax"}
+#define ACTIVATION {"relu", "sigmoid"} // softmax is not working correct yet
 #define PATH_TRAIN "mnist_train.csv"
 #define PATH_TEST "mnist_test.csv"
 
@@ -38,8 +38,6 @@ int count_matches_in_batch(const std::vector<int>& a, const std::vector<int>& b)
 	}
 	return success;
 }
-
-
 int main(int argc, char** argv) {	
 	
 	//read and parse datasets
@@ -52,9 +50,11 @@ int main(int argc, char** argv) {
 	Timer timer;
 	PercentageBar percentage_bar;
 
+	//start time measurement
 	log("training progress"); 
 	timer.reset();
 
+	//start training
 	int training_iteration = 0;
 	for (int epochs = 0; epochs < EPOCHS; epochs++) {
 		for (int i = 0; i < TRAINSIZE / BATCHSIZE; i++) {
@@ -68,6 +68,7 @@ int main(int argc, char** argv) {
 	timer.print_time<s>();
 	percentage_bar.reset();
 
+	//start testing
 	log("testing progress");
 	timer.reset();
 
@@ -86,6 +87,8 @@ int main(int argc, char** argv) {
 
 	}
 	timer.print_time<s>();
+
+	//print successrate
 	std::cout << "successrate = " << (success * 100 / TESTSIZE) << "%" << std::endl;
 	std::cout << "\a";
 

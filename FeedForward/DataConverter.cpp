@@ -3,6 +3,7 @@
 #include "PercentageBar.h"
 
 using String = std::string;
+
 DataConverter::DataConverter(const std::string& path, const int& dataset_size, const int& input_dimension, const int& output_dimension) 
 	:	path(path), 
 		dataset_size(dataset_size),
@@ -55,7 +56,6 @@ DataConverter::DataConverter(const std::string& path, const int& dataset_size, c
 		exit(100);
 	}
 }
-
 DataConverter::DataConverter(const std::string& path, const int& dataset_size, const int& input_dimension, const int& output_dimension, const int& batch_size)
 	: path(path),
 	dataset_size(dataset_size),
