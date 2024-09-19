@@ -28,8 +28,3 @@ DataConverter parses these files, normalizes the colour values to be between 0 a
   - the batch size in order to combine input vectors and label vectors into batches (matrices with the number of columns equal to the batch size)
   
 The matrix class for arithmetic datatypes implements the algebraic functions for the neural network. It is designed for minimizing unnecessary copies and using move assignments and constructors instead.
-
-Future updates:
-  - the ability to draw with the mouse directly into the console for writing handwritten digits which the network can try to recognize
-  - the softmax activation function
-  - recurrent and convolutional neural network
